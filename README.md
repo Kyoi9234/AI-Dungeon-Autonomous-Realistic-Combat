@@ -23,12 +23,18 @@ Combatants may:
 - Coordinate with allies
 ⚡ Continuous Anime-Style Combat
 Combat is not treated as one action per turn.
+
 Characters can chain attacks together, pursue opponents, interrupt techniques, counter counters, and keep attacking while they still have momentum, stamina, energy, and opportunity.
+
 Example:
 Punch → elbow → grab → throw → pursuit → follow-up
+
 or:
+
 Slash → dodge → counter → projectile → rush
+
 A missed or blocked attack does not automatically end a combination.
+
 🎯 Player Actions Are Attempts
 The player cannot force an outcome simply by typing it.
 For example:
