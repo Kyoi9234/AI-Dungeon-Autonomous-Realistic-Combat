@@ -2,8 +2,8 @@ const modifier = (text) => {
   const ACTION = info.actionCount || 0;
   const COMBAT_GRACE_ACTIONS = 6;
   const CARD_MEMORY_ACTIONS = 10;
-  const MAX_ACTIVE_CARDS = 10;
-  const MAX_CARD_CONTEXT_CHARS = 5000;
+  const MAX_ACTIVE_CARDS = 20;
+  const MAX_CARD_CONTEXT_CHARS = 20000;
 
   /*
    * ============================================================
