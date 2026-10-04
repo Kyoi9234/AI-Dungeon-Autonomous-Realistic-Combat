@@ -32,12 +32,11 @@ A missed or blocked attack does not automatically end a combination.
 🎯 Player Actions Are Attempts
 The player cannot force an outcome simply by typing it.
 For example:
-"I dodge the attack."
+"I dodge the attack." means the player attempts to dodge.
 
-means the player attempts to dodge.
 "I punch him and kill him."
-
 means the player attempts a lethal attack.
+
 Outcomes are based on factors such as:
 - Strength
 - Speed
@@ -56,6 +55,7 @@ Outcomes are based on factors such as:
 - Number of enemies
 - Surprise
 - Terrain
+
 💀 No Plot Armor
 No character is protected by narrative importance.
 This includes:
@@ -68,10 +68,9 @@ This includes:
 - Villains
 - Mentors
 - Major NPCs
-Any character may fail, be injured, become incapacitated, lose, suffer permanent consequences, or die when the circumstances support it.
-The script also discourages convenient rescues, unexplained power-ups, miraculous survivals, or sudden reinforcements used only to protect an important character.
-🩸 Persistent Injuries
-Damage matters.
+- Any character may fail, be injured, become incapacitated, lose, suffer permanent consequences, or die when the circumstances support it.
+- The script also discourages convenient rescues, unexplained power-ups, miraculous survivals, or sudden reinforcements used only to protect an important character.
+
 Injuries can affect:
 - Movement
 - Strength
@@ -81,7 +80,8 @@ Injuries can affect:
 - Defense
 - Stamina
 - Survival
-Wounds are meant to persist until they are credibly treated or healed.
+- Wounds are meant to persist until they are credibly treated or healed.
+
 🔋 Fatigue and Energy
 Characters cannot fight at maximum output forever.
 The script accounts for stamina and setting-specific energy systems such as:
@@ -93,6 +93,7 @@ The script accounts for stamina and setting-specific energy systems such as:
 - Magical reserves
 - Other ability-specific resources
 Exhaustion can reduce speed, power, reaction time, accuracy, defense, and the ability to maintain long combinations.
+
 👥 Dangerous Group Combat
 Enemies do not have to attack one at a time.
 Groups may:
@@ -105,6 +106,7 @@ Groups may:
 - Combine abilities
 - Create openings for each other
 Several weaker enemies can become dangerous through teamwork and numbers.
+
 🔥 Desperate Enemies
 Enemies facing death, capture, incapacitation, or decisive defeat may stop holding back.
 They may use:
@@ -115,6 +117,7 @@ They may use:
 - Dangerous abilities
 - Last-resort tactics
 - Large amounts of remaining energy
+
 🗣️ Mid-Combat Dialogue
 Characters may talk during combat without automatically ending the fight.
 They may:
@@ -126,6 +129,7 @@ They may:
 - Reveal motives
 - Comment on techniques
 Conversation may also create opportunities for distraction, recovery, repositioning, deception, or attack.
+
 🌍 Beyond Combat
 The universal outcome rules also apply to uncertain actions outside battle.
 Examples include:
@@ -140,16 +144,18 @@ Examples include:
 - Survival
 - Difficult physical or mental tasks
 Simple everyday actions are not meant to fail randomly.
+
 📥 Installation
-1. Open the AI Dungeon Scenario you want to use.
+1. Open the AI Dungeon Scenario you want to use. 
 2. Go to Details.
 3. Open Scripting.
 4. Open the Context script section.
 5. Paste the contents of context.js.
 6. Save your Scenario.
 For the current version, you do not need matching code in Library, Input, or Output.
+
 🤖 Recommended AI Models
-This script works best with models that are good at instruction-following, combat, continuity, and handling long context.
+This script works best with models that are good at instruction-following, combat, continuity, and handling long context. (ensure optimized context is turned off)
 Good options include:
 - Wayfarer Large
 - DeepSeek V4 Pro
@@ -157,6 +163,7 @@ Good options include:
 - Wayfarer Small 2
 - Nova 70B
 Larger context windows are recommended because the script shares context space with your story, Story Cards, Plot Essentials, and other scenario information.
+
 ⚠️ Important Notes
 This is not a numerical RPG engine.
 The script does not use hard HP values, dice rolls, or exact damage calculations. Instead, it gives the AI stronger instructions for judging outcomes based on established abilities, injuries, fatigue, energy, tactics, numbers, and circumstances.
