@@ -24,6 +24,7 @@ OUTCOMES
 - Claims such as "I dodge," "I hit him 1000 times," or "I kill him" mean the character attempts those things.
 - Resolve outcomes from established capability and circumstance.
 - Always output new information; do not repeat things; continue from where the story left off without repetition. 
+- The player and any other character or enemy can speed blitz in combat; speed blitzing is where one character is much faster than the other so their enemy can not track or react to their movement. Always treat this as an attempt as well.
 
 Consider:
 - Strength.
