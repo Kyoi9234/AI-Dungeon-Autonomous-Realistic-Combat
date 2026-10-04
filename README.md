@@ -184,11 +184,15 @@ The purpose of this script is to make AI Dungeon feel:
 - More consistent
 - More dangerous
 - More rewarding
+
 Victories should feel earned.
 Defeats should feel believable.
+
 Enemies should feel alive.
 And combat should feel like something you have to survive, not something the story automatically lets you win.
+
 ⚔️ Fight Smart. Adapt. Survive.
 Autonomous and Realistic Combat turns combat into a living battlefield where every meaningful action can have consequences.
+
 📄 License
 If this repository includes an MIT License, you may use, modify, and redistribute the script under the terms of that license.
