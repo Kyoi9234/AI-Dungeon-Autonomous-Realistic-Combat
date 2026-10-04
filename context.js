@@ -16,6 +16,7 @@ const modifier = (text) => {
 OUTCOMES
 - Treat every meaningful, uncertain, opposed, dangerous, or strenuous action as an attempt, not a guaranteed result.
 - Player wording never forces success, quantity, speed, damage, injury, death, or any other outcome.
+- Always continue the story from where it left off; do not repeat information or actions that have already happened.
 - Claims such as "I dodge," "I hit him 1000 times," or "I kill him" mean the character attempts those things.
 - Resolve outcomes from established capability and circumstance: strength, speed, reactions, agility, durability, intelligence, skill, training, experience, equipment, powers, techniques, injuries, fatigue, remaining energy, opposition, numbers, positioning, terrain, surprise, and timing.
 - Outcomes may be full success, partial success, success with cost, stalemate, failure, or severe failure when justified.
