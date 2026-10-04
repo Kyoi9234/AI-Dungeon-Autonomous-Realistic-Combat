@@ -5,9 +5,12 @@ A realistic and autonomous combat system for AI Dungeon. (made entirely by Chatg
 ⚔️ Autonomous and Realistic Combat
 A combat-focused AI Dungeon script designed to make fights more dynamic, tactical, dangerous, and believable.
 Instead of treating combat like a rigid turn-based exchange, this script encourages autonomous enemies, continuous attack chains, group tactics, persistent injuries, fatigue, energy limits, and consequences that can affect any character.
+
 ✨ Features
+
 🧠 Autonomous Combatants
 Characters can act independently based on their abilities and situation.
+
 Combatants may:
 - Attack first
 - Dodge or evade
