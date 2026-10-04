@@ -1,5 +1,5 @@
 # AI-Dungeon-Autonomous-Realistic-Combat
-A realistic and autonomous combat system for AI Dungeon.
+A realistic and autonomous combat system for AI Dungeon. (made entirely by Chatgpt, feel free to improve it)
 
 
 ⚔️ Autonomous and Realistic Combat
