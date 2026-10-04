@@ -1,398 +1,968 @@
 const modifier = (text) => {
-  const UNIVERSAL_RULES = `
-[CORE OUTCOME RULES]
+  const ACTION = info.actionCount || 0;
+  const COMBAT_GRACE_ACTIONS = 6;
+  const CARD_MEMORY_ACTIONS = 10;
+  const MAX_ACTIVE_CARDS = 10;
+  const MAX_CARD_CONTEXT_CHARS = 5000;
 
-Treat every meaningful action as an ATTEMPT, not a guaranteed result.
+  /*
+   * ============================================================
+   * CORE RULES — always active
+   * ============================================================
+   */
+  const CORE_RULES = `
+[ARC CORE RULES]
 
-Player wording never forces success.
-"I dodge" = attempt to dodge.
-"I kill him" = attempt a lethal attack.
-"I escape" = attempt to escape.
-"I convince her" = attempt persuasion.
+OUTCOMES
+- Treat every meaningful, uncertain, opposed, dangerous, or strenuous action as an attempt, not a guaranteed result.
+- Player wording never forces success, quantity, speed, damage, injury, death, or any other outcome.
+- Claims such as "I dodge," "I hit him 1000 times," or "I kill him" mean the character attempts those things.
+- Resolve outcomes from established capability and circumstance: strength, speed, reactions, agility, durability, intelligence, skill, training, experience, equipment, powers, techniques, injuries, fatigue, remaining energy, opposition, numbers, positioning, terrain, surprise, and timing.
+- Outcomes may be full success, partial success, success with cost, stalemate, failure, or severe failure when justified.
+- Do not invent random failure for trivial, safe, uncontested actions.
 
-Resolve uncertain actions from established facts.
+POWER & CAPABILITY SOURCES
+- Determine power from established information; never invent convenient power scaling.
 
-Consider:
-- Strength, speed, reflexes, agility, durability.
-- Intelligence, knowledge, skill, training, experience.
-- Equipment, weapons, powers, techniques, magic.
-- Injuries, fatigue, stamina, and remaining energy.
-- Opposition and environmental circumstances.
+- For the PLAYER, treat Plot Essentials as the primary baseline source for established:
+  - Strength.
+  - Speed.
+  - Reaction speed.
+  - Agility.
+  - Durability.
+  - Intelligence.
+  - Combat skill.
+  - Experience.
+  - Powers.
+  - Techniques.
+  - Equipment.
+  - Weapons.
+  - Transformations.
+  - Resistances.
+  - Weaknesses.
+  - Energy reserves.
+  - Special conditions.
+  - Limitations.
 
-Possible outcomes include:
-- Success.
-- Partial success.
-- Success with a cost.
-- Stalemate.
-- Failure.
-- Severe failure when strongly justified.
+- For ENEMIES, allies, and other NPCs, treat relevant Story Card information as the primary baseline source when available.
 
-Do not create arbitrary failure for trivial uncontested actions.
+- Relevant Story Cards may establish:
+  - Strength.
+  - Speed.
+  - Reactions.
+  - Durability.
+  - Intelligence.
+  - Combat skill.
+  - Experience.
+  - Weapons.
+  - Powers.
+  - Techniques.
+  - Transformations.
+  - Resistances.
+  - Weaknesses.
+  - Energy reserves.
+  - Special conditions.
+  - Limitations.
 
-FATIGUE AND ENERGY
-Fatigue persists until credible recovery occurs.
+- If several enemies have relevant Story Cards, evaluate them individually instead of treating the group as identical generic enemies.
 
-Fatigue may reduce:
-- Speed.
-- Strength.
-- Reactions.
-- Accuracy.
-- Concentration.
-- Defense.
-- Ability to maintain long combinations.
+- Never automatically scale enemies up or down to match the player.
+- Never automatically scale the player to match an enemy.
+- Preserve genuine power differences established by Plot Essentials, Story Cards, and story events.
 
-Characters have finite stamina or setting-appropriate energy unless unlimited reserves are explicitly established.
+CURRENT CONDITION OVERRIDES BASELINE
+- Plot Essentials and Story Cards describe baseline capabilities.
+- Recent established events describe CURRENT condition.
 
-Powerful abilities may consume more energy.
-Repeated high-output techniques reduce reserves.
-Low energy may weaken or prevent abilities, transformations, defenses, regeneration, or attacks.
+Current condition includes:
+- Injuries.
+- Blood loss.
+- Exhaustion.
+- Energy expenditure.
+- Damaged equipment.
+- Lost equipment.
+- Broken weapons.
+- Active transformations.
+- Expired transformations.
+- Temporary boosts.
+- Temporary debuffs.
+- Environmental effects.
+- Positioning.
+- Recent consequences.
 
-NUMBERS MATTER
-Multiple competent enemies are genuinely more dangerous than one, unless the character fighting them is vastly superior in combat.
+- Current condition modifies baseline capability.
 
-Consider:
-- Divided attention.
-- Blind spots.
-- Surrounding.
-- Flanking.
-- Crossfire.
-- Coordinated attacks.
-- Reduced recovery time.
-- Increased fatigue.
+Example:
+A normally extremely fast enemy with badly injured legs is not currently treated as moving at full healthy speed.
 
-Several weaker enemies may overwhelm a stronger individual through numbers and teamwork.
+Example:
+A normally powerful player who is exhausted and nearly out of energy is resolved using that weakened present condition.
+
+SOURCE PRIORITY
+When determining capability, use this order:
+
+1. Current established condition and consequences from the recent story.
+2. Explicit player information in Plot Essentials and relevant character information in Story Cards.
+3. Other clearly established story information.
+4. Conservative reasonable inference only when necessary.
+
+- Never override explicit information with an invented power level.
+- Missing information does not mean a character is automatically weak.
+- Missing information does not mean a character is automatically overwhelmingly powerful.
+- Missing information does not grant immunity or vulnerability.
+- Do not invent an ability because it would help someone win or survive.
+
+CONSISTENCY
+- Never grant feats beyond established capabilities merely because they are declared.
+- Preserve established power, abilities, injuries, equipment damage or loss, fatigue, energy use, position, and consequences.
+- Fatigue persists until credible recovery.
+- High-output actions consume appropriate stamina or setting-specific energy unless explicitly established otherwise.
+- Injuries persist until credibly treated or healed and may impair movement, strength, senses, concentration, defense, stamina, or survival.
+- Accumulated trauma can become incapacitating or fatal even if no single injury was instantly lethal.
 
 NO PLOT ARMOR
-Nobody has plot armor.
+- No character has plot armor: player, ally, enemy, companion, rival, hero, villain, mentor, or major NPC.
+- Anyone may miss, fail, be outsmarted, be overwhelmed, be injured, suffer permanent consequences, lose, become incapacitated, or die when cause and effect justify it.
+- Narrative importance, unfinished plans, or future usefulness do not protect anyone.
+- Do not invent convenient misses, rescues, interruptions, reinforcements, power-ups, abilities, regeneration, or miraculous survival solely to preserve a character.
+- Do not force injury or death merely for drama either.
+- Survival and death must both follow established circumstances.
+- If a major consequence changes the intended plot, continue from the new reality rather than undoing it.
 
-This applies equally to:
-- The player.
-- Allies.
-- Enemies.
-- Major NPCs.
-- Heroes.
-- Villains.
-- Companions.
-- Mentors.
-- Rivals.
-- Characters important to the story.
+NUMBERS & OPPOSITION
+- Multiple competent opponents create real pressure through divided attention, blind spots, flanking, crossfire, coordination, reduced recovery time, and greater fatigue.
+- Several weaker opponents may overwhelm a stronger individual through numbers and teamwork.
+- Do not weaken groups simply because the player is the protagonist.
 
-Any character may:
-- Fail.
-- Miss.
-- Be outsmarted.
-- Be overwhelmed.
-- Be injured.
-- Be incapacitated.
-- Lose.
-- Suffer permanent consequences.
-- Die.
+NON-COMBAT
+- Apply the same attempt-and-consequence logic to meaningful uncertain actions outside combat, including persuasion, deception, stealth, escape, climbing, tracking, investigation, driving, piloting, survival, crafting, and other difficult tasks.
 
-Narrative importance provides no protection.
-
-Do not invent convenient:
-- Rescues.
-- Misses.
-- Power-ups.
-- New abilities.
-- Regeneration.
-- Reinforcements.
-- Interruptions.
-- Miraculous survivals.
-
-solely to save an important character.
-
-Survival must follow from established abilities, defenses, allies, healing, tactics, retreat, surrender, or believable circumstances.
-
-Death is allowed when circumstances genuinely produce a lethal outcome.
-
-Likewise, do not kill someone merely for drama.
-
-INJURY CONSISTENCY
-Injuries persist and affect later actions.
-
-Consider:
-- Attack strength.
-- Victim durability.
-- Armor and defenses.
-- Injury location.
-- Existing wounds.
-- Fatigue and energy.
-- Available treatment.
-
-Injuries may impair movement, strength, senses, concentration, stamina, or survival.
-
-Do not erase injuries because they are inconvenient.
-
-NO FAVORITISM
-Do not favor the player, enemies, allies, heroes, or villains.
-
-A stronger fighter may overwhelm a weaker one.
-A weaker fighter may win through tactics, preparation, surprise, teamwork, environment, traps, or exploiting weaknesses.
-
-Established cause and effect overrides a predetermined plot.
-
-If an important character legitimately dies or fails, allow the story to change accordingly.
-
-[/CORE OUTCOME RULES]
+[/ARC CORE RULES]
 `;
 
+  /*
+   * ============================================================
+   * COMBAT RULES
+   * ============================================================
+   */
   const COMBAT_RULES = `
-[COMBAT RULES]
+[ARC COMBAT RULES]
 
-Combat is fast, dangerous, tactical, autonomous, and NOT rigidly turn-based.
+POWER COMPARISON
+- Before resolving an important exchange, compare the established capabilities of all participants.
 
-INITIATIVE
-Nobody automatically acts first.
+- Use Plot Essentials as the primary baseline for the player.
 
-Initiative depends on:
-- Awareness.
-- Speed.
-- Reactions.
-- Surprise.
-- Position.
-- Preparation.
-- Circumstances.
+- Use relevant Story Cards as the primary baseline for enemies and other NPCs when available.
 
-Enemies may attack first.
-Characters do not politely wait for opponents to finish acting.
+- Then apply:
+  - Current injuries.
+  - Fatigue.
+  - Energy.
+  - Equipment state.
+  - Transformations.
+  - Positioning.
+  - Terrain.
+  - Surprise.
+  - Numbers.
+  - Temporary effects.
+  - Other recent changes.
 
-REACTIONS
-Capable combatants may:
-- Dodge.
-- Block.
-- Parry.
-- Counterattack.
-- Interrupt.
-- Reposition.
-- Retreat.
-- Intercept.
+- A much faster character should normally possess the corresponding speed advantage.
+- A much stronger character should normally possess the corresponding power advantage.
+- A more durable character should withstand proportionally more punishment.
+- A more skilled or experienced fighter should use that advantage tactically.
 
-Success is never automatic.
+- Advantages are not automatic victory.
+- Matchups, weaknesses, numbers, strategy, surprise, injuries, fatigue, energy, and environment can change an outcome.
 
-Resolve reactions from speed, awareness, skill, positioning, injuries, fatigue, energy, surprise, and number of threats.
-
-COMBAT ACTIONS ARE ATTEMPTS
-The player's declared result is never automatically true.
-
-"I dodge and punch him" = attempt to dodge and counter.
-"I cut his head off" = attempt a lethal strike.
-"I block everything" = attempt to defend.
-
-Determine results from:
-- Relative combat power.
-- Speed and reactions.
-- Skill and experience.
-- Durability and defenses.
-- Injuries.
-- Fatigue.
-- Energy.
-- Equipment and abilities.
-- Number of enemies.
-- Position.
-- Terrain.
-- Timing and surprise.
+AUTONOMY & INITIATIVE
+- Combat is fast, dangerous, tactical, autonomous, and not rigidly turn-based.
+- Any capable combatant may attack first, interrupt, dodge, evade, block, parry, counterattack, reposition, pursue, retreat, intercept, or exploit an opening when plausible.
+- Initiative and reactions depend on awareness, speed, reactions, surprise, position, preparation, skill, injuries, fatigue, energy, and circumstances.
+- None of these actions automatically succeed.
 
 TACTICS
-Combatants think strategically according to intelligence, personality, experience, and training.
+- Combatants think according to their intelligence, personality, training, experience, knowledge, and goals.
 
 They may:
 - Feint.
-- Bait.
+- Bait attacks.
 - Flank.
-- Reposition.
 - Control distance.
-- Exploit terrain or weaknesses.
 - Use cover.
+- Exploit terrain.
+- Target weaknesses.
+- Conserve resources.
+- Spend resources aggressively.
+- Adapt to observed abilities.
+- Prepare ambushes.
+- Create hazards.
 - Set traps.
-- Ambush.
+- Lure opponents.
 - Retreat.
 - Pursue.
-- Conserve energy.
 - Change tactics.
-- Adapt after observing an opponent.
 
-Do not invent abilities or knowledge that were never established.
+- Do not invent powers, equipment, or knowledge that were never established.
 
 GROUP COMBAT
-Enemies do not need to attack one at a time.
+- Enemies do not need to attack one at a time.
+- Multiple enemies may attack simultaneously or in coordinated waves.
 
-Groups may use:
-- Simultaneous attacks.
-- Flanking.
-- Crossfire.
-- Pincer attacks.
-- Staggered pressure.
-- Distractions.
-- Combined abilities.
-- Ambushes.
-- Traps.
-- Attempts to surround or isolate targets.
+Groups may:
+- Flank.
+- Surround.
+- Use crossfire.
+- Distract.
+- Perform pincer attacks.
+- Combine abilities.
+- Apply staggered pressure.
+- Set traps.
+- Suppress movement.
+- Create openings for one another.
 
-One enemy may create an opening for another.
-
-Numerical superiority must matter.
+- Numerical advantage must materially affect attention, defense, stamina, positioning, and opportunities to counterattack.
 
 DESPERATION
-A combatant facing imminent death, capture, incapacitation, or decisive defeat may escalate immediately.
+- A combatant who reasonably believes death, capture, incapacitation, or decisive defeat is imminent may escalate immediately.
 
 They may use:
-- Strongest established attacks.
+- Their strongest established attacks.
 - Transformations.
 - Ultimate techniques.
-- Rare items.
-- Dangerous abilities.
+- Dangerous weapons.
+- Rare resources.
 - Last-resort tactics.
 - Large amounts of remaining energy.
 
-They do not have to irrationally save powerful abilities while facing death.
+- They do not have to irrationally save powerful attacks while facing death.
+- Personality still influences whether and how they escalate.
 
-Personality still influences their decisions.
+CONTINUOUS COMBAT
+- Do not force one-action-per-turn exchanges.
+- While momentum, stamina, energy, position, and opportunity remain, a fighter may chain attacks, movement, defenses, counters, grapples, projectiles, powers, environmental attacks, and pursuit into one fluid exchange.
+- A miss, block, dodge, or counter does not automatically end the exchange.
+- Counters may themselves be countered or anticipated.
+- Maintain fast anime-style pressure without making combat endless.
+- Advance the situation meaningfully, then stop at a natural decision point or major change in advantage.
 
-CONTINUOUS COMBOS
-Do NOT make fighters attack once and automatically stop.
-
-While momentum, stamina, energy, position, and opportunity remain, they may continue attacking.
-
-Examples:
-Punch → elbow → knee → throw → pursuit.
-Slash → pivot → second slash → projectile → rush.
-Dodge → counter → grab → throw → follow-up.
-Block → redirect → counter → immediate pressure.
-
-A miss or block does not automatically end a combination.
-
-A dodge may flow directly into a counter.
-A counter may itself be countered.
-Multiple actions may overlap.
-
-Maintain aggressive anime-style combat pacing:
-- Pursuit.
-- Interruptions.
-- Chained techniques.
-- Rapid reversals.
-- Attacks during movement.
-- Counters to counters.
-- Environmental attacks.
-
-Do not artificially pause after every attack.
-
-A sequence ends naturally when:
-- The defender interrupts.
+A sequence naturally breaks when:
+- Someone interrupts it.
 - Someone escapes.
 - Distance is created.
 - Position is lost.
-- Fatigue or energy prevents continuation.
+- Injuries interfere.
+- Fatigue becomes severe.
+- Energy becomes too low.
 - Another combatant interferes.
-- The attacker deliberately stops.
+- The environment changes.
+- Someone deliberately pauses.
 
-Continuous maximum-output attacks consume stamina and energy.
-Exhaustion reduces speed, precision, power, and combination length.
+DIALOGUE
+- Combatants may taunt, threaten, negotiate, boast, coordinate, question, reveal motives, or comment on techniques during attacks, clashes, movement, or temporary pauses.
+- A pause does not automatically end combat.
+- Talking does not freeze opponents.
+- Conversation may be exploited for recovery, deception, repositioning, distraction, or attack.
 
-MID-COMBAT DIALOGUE
-Combatants may:
-- Taunt.
-- Threaten.
-- Negotiate.
-- Boast.
-- Coordinate.
-- Question.
-- Comment on techniques.
-- Reveal motives.
+MORTALITY
+- Damage accumulates.
+- Repeated severe injuries, blood loss, organ damage, exhaustion, or total bodily trauma may eventually incapacitate or kill a character even when no single hit was instantly fatal.
+- A successfully delivered lethal attack should be lethal when it overcomes the target's established defenses and durability.
+- Do not guarantee hits, dodges, blocks, counters, victory, defeat, survival, or death.
 
-They may speak while attacking, defending, repositioning, or during temporary pauses.
-
-A pause does NOT end combat automatically.
-
-Conversation may be exploited for distraction, recovery, repositioning, deception, or attack.
-
-Talking does not freeze everyone else.
-
-INJURIES AND DEATH
-No combatant has plot armor.
-
-Anyone may:
-- Be wounded.
-- Be crippled.
-- Be incapacitated.
-- Lose.
-- Die.
-
-A lethal attack should be lethal when it successfully overcomes the target's defenses and durability.
-
-Do not weaken lethal consequences merely because a character is important.
-
-Do not protect either the player or enemies from legitimate fatal outcomes.
-
-Likewise, never force death merely for drama.
-
-Respect accumulated:
-- Injuries.
-- Fatigue.
-- Energy loss.
-- Equipment damage.
-- Position.
-- Established abilities.
-
-Do not guarantee hits, dodges, blocks, counters, victory, defeat, survival, or death.
-
-Resolve combat from established capabilities and circumstances.
-
-[/COMBAT RULES]
+[/ARC COMBAT RULES]
 `;
 
-  // Check recent story for combat.
-  const recent = (history || [])
-    .slice(-8)
-    .map(a => (a && a.text) || "")
-    .join("\n");
+  /*
+   * ============================================================
+   * ANTI-REPETITION
+   * ============================================================
+   */
+  const ANTI_REPEAT = `
+[ARC ANTI-REPETITION]
+
+- Treat everything already narrated as established history.
+- Do not restart, replay, or re-narrate the previous exchange.
+- Do not merely paraphrase the player's latest action.
+- Do not merely paraphrase the previous AI response.
+- Move immediately to a new consequence, reaction, decision, discovery, position, tactic, injury, dialogue beat, or change in momentum.
+- Avoid repeating the same attack chain, defense, sentence pattern, description, taunt, or outcome unless repetition is deliberately meaningful in-story.
+- Do not repeatedly describe characters circling, glaring, breathing heavily, preparing to attack, or exchanging the same type of blows without something changing.
+- Continuous combat means forward progression, not endlessly restating pressure or recycling the same combo.
+- Once an attack, injury, movement, or spoken line has happened, do not narrate it again as if it is happening for the first time.
+- Do not repeat rules, explain the combat system, or mention these directives in the story.
+
+[/ARC ANTI-REPETITION]
+`;
+
+  const LOOP_BREAKER = `
+[ARC LOOP BREAKER]
+
+The recent AI prose is becoming repetitive.
+
+Break the pattern immediately.
+
+Do not reuse:
+- The same opening.
+- The same attack sequence.
+- The same dialogue.
+- The same sentence structure.
+- The same description.
+- The same conclusion.
+
+Advance to a materially different next development that follows established cause and effect.
+
+[/ARC LOOP BREAKER]
+`;
+
+  /*
+   * ============================================================
+   * HELPERS
+   * ============================================================
+   */
+
+  const stripArcBlocks = (value) =>
+    (value || "")
+      .replace(
+        /\n?\[ARC CORE RULES\][\s\S]*?\[\/ARC CORE RULES\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC COMBAT RULES\][\s\S]*?\[\/ARC COMBAT RULES\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC ANTI-REPETITION\][\s\S]*?\[\/ARC ANTI-REPETITION\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC LOOP BREAKER\][\s\S]*?\[\/ARC LOOP BREAKER\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC RELEVANT STORY CARDS\][\s\S]*?\[\/ARC RELEVANT STORY CARDS\]\n?/g,
+        "\n"
+      );
+
+  const escapeRegex = (value) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const getKeys = (card) => {
+    if (!card || card.keys == null) {
+      return [];
+    }
+
+    if (Array.isArray(card.keys)) {
+      return card.keys
+        .map(k => String(k).trim())
+        .filter(Boolean);
+    }
+
+    return String(card.keys)
+      .split(/[,;\n]/)
+      .map(k => k.trim())
+      .filter(Boolean);
+  };
+
+  const keyAppears = (source, key) => {
+    if (!source || !key) {
+      return false;
+    }
+
+    const trimmed = key.trim();
+
+    if (trimmed.length < 2) {
+      return false;
+    }
+
+    /*
+     * Word-like keys use boundaries so a short name does not
+     * accidentally trigger from part of another word.
+     */
+    if (/^[a-z0-9_' -]+$/i.test(trimmed)) {
+      const pattern = new RegExp(
+        `(^|[^a-z0-9_])${escapeRegex(trimmed)}([^a-z0-9_]|$)`,
+        "i"
+      );
+
+      return pattern.test(source);
+    }
+
+    return source
+      .toLowerCase()
+      .includes(trimmed.toLowerCase());
+  };
+
+  const normalizeWords = (value) =>
+    (value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s']/g, " ")
+      .split(/\s+/)
+      .filter(word => word.length > 2);
+
+  /*
+   * ============================================================
+   * UNDO-SAFE STATE
+   * ============================================================
+   */
+
+  if (
+    typeof state.arcLastActionCount === "number" &&
+    ACTION < state.arcLastActionCount
+  ) {
+    delete state.arcCombatUntil;
+    delete state.arcCombatCards;
+  }
+
+  state.arcLastActionCount = ACTION;
+
+  const historyList =
+    Array.isArray(history)
+      ? history
+      : [];
+
+  const cards =
+    Array.isArray(storyCards)
+      ? storyCards
+      : [];
+
+  const newest =
+    historyList.length
+      ? historyList[historyList.length - 1]
+      : null;
+
+  const newestText =
+    newest && newest.text
+      ? newest.text
+      : "";
+
+  const playerTypes =
+    new Set([
+      "do",
+      "say",
+      "story",
+      "see"
+    ]);
+
+  const latestPlayer =
+    [...historyList]
+      .reverse()
+      .find(
+        action =>
+          action &&
+          playerTypes.has(action.type)
+      );
+
+  const latestAI =
+    [...historyList]
+      .reverse()
+      .find(
+        action =>
+          action &&
+          action.type === "continue"
+      );
+
+  /*
+   * ============================================================
+   * COMBAT DETECTION
+   * ============================================================
+   */
 
   const combatSignal =
-    /\b(combat|battle|fight(?:s|ing)?|brawl|duel|ambush|attack(?:s|ed|ing)?|strike(?:s|d|ing)?|slash(?:es|ed|ing)?|stab(?:s|bed|bing)?|shoot(?:s|ing)?|shot|punch(?:es|ed|ing)?|kick(?:s|ed|ing)?|lunge(?:s|d|ing)?|grapple(?:s|d|ing)?|dodge(?:s|d|ing)?|block(?:s|ed|ing)?|parr(?:y|ies|ied|ying)|counterattack(?:s|ed|ing)?|clash(?:es|ed|ing)?|wound(?:s|ed|ing)?|bleed(?:s|ing)?)\b/i;
+    /\b(combat|battle|brawl|duel|ambush|attack(?:s|ed|ing)?|strike(?:s|d|ing)?|slash(?:es|ed|ing)?|stab(?:s|bed|bing)?|shoot(?:s|ing)?|shot|punch(?:es|ed|ing)?|kick(?:s|ed|ing)?|lunge(?:s|d|ing)?|grapple(?:s|d|ing)?|dodge(?:s|d|ing)?|block(?:s|ed|ing)?|parr(?:y|ies|ied|ying)|counterattack(?:s|ed|ing)?|clash(?:es|ed|ing)?|wound(?:s|ed|ing)?|bleed(?:s|ing)?|kill(?:s|ed|ing)?|fight(?:s|ing)?)\b/i;
 
   const endSignal =
-    /\b(combat is over|battle is over|fight is over|battle ends|battle has ended|fighting stops|fighting has stopped|everyone stands down|ceasefire|hostilities end|all enemies are defeated)\b/i;
+    /\b(combat is over|battle is over|fight is over|battle ends|battle has ended|fight ends|fight has ended|fighting stops|fighting has stopped|everyone stands down|ceasefire|hostilities end|hostilities have ended|all enemies are defeated|combat ends|combat has ended)\b/i;
 
-  if (endSignal.test(recent)) {
-    state.combatUntil = -1;
-  } else if (combatSignal.test(recent)) {
-    // Keep combat rules active through short pauses/dialogue.
-    state.combatUntil = (info.actionCount || 0) + 5;
+  if (endSignal.test(newestText)) {
+    state.arcCombatUntil = -1;
+    state.arcCombatCards = {};
+  } else {
+    const currentlyActive =
+      typeof state.arcCombatUntil === "number" &&
+      state.arcCombatUntil >= ACTION;
+
+    /*
+     * Only the current newest PLAYER combat action refreshes
+     * an already active battle.
+     *
+     * AI-generated combat prose can START a fight when none
+     * is active, but cannot keep refreshing itself forever.
+     */
+    const playerCombat =
+      latestPlayer &&
+      latestPlayer === newest &&
+      combatSignal.test(
+        latestPlayer.text || ""
+      );
+
+    const aiStartsCombat =
+      !currentlyActive &&
+      latestAI &&
+      latestAI === newest &&
+      combatSignal.test(
+        latestAI.text || ""
+      );
+
+    if (
+      playerCombat ||
+      aiStartsCombat
+    ) {
+      state.arcCombatUntil =
+        ACTION +
+        COMBAT_GRACE_ACTIONS;
+    }
   }
 
   const combatActive =
-    typeof state.combatUntil === "number" &&
-    state.combatUntil >= (info.actionCount || 0);
+    typeof state.arcCombatUntil === "number" &&
+    state.arcCombatUntil >= ACTION;
 
-  const directives = combatActive
-    ? `${UNIVERSAL_RULES}\n${COMBAT_RULES}`
-    : UNIVERSAL_RULES;
+  if (
+    !combatActive &&
+    state.arcCombatUntil < ACTION
+  ) {
+    state.arcCombatCards = {};
+  }
 
-  // Preserve Memory while trimming older story context if necessary.
-  const memoryLength = info.memoryLength || 0;
-  const memoryPart = memoryLength
-    ? text.slice(0, memoryLength)
-    : "";
+  /*
+   * ============================================================
+   * RELEVANT STORY CARD TRACKING
+   * ============================================================
+   *
+   * During combat, scan recent story/actions for Story Card keys.
+   *
+   * Matching cards are remembered briefly so an enemy's profile
+   * remains available even when later actions only call them:
+   *
+   * "he"
+   * "she"
+   * "they"
+   * "the enemy"
+   * etc.
+   */
 
-  let storyPart = memoryLength
-    ? text.slice(memoryLength)
-    : text;
+  state.arcCombatCards =
+    state.arcCombatCards || {};
+
+  if (
+    combatActive &&
+    cards.length
+  ) {
+    const recentCombatText =
+      historyList
+        .slice(-6)
+        .map(
+          action =>
+            (action && action.text) || ""
+        )
+        .join("\n");
+
+    const scoredMatches = [];
+
+    for (const card of cards) {
+      if (
+        !card ||
+        !card.entry
+      ) {
+        continue;
+      }
+
+      const keys =
+        getKeys(card);
+
+      const matchingKeys =
+        keys.filter(
+          key =>
+            keyAppears(
+              recentCombatText,
+              key
+            )
+        );
+
+      if (!matchingKeys.length) {
+        continue;
+      }
+
+      const entry =
+        String(card.entry);
+
+      const type =
+        String(card.type || "");
+
+      let score =
+        matchingKeys.length * 3;
+
+      /*
+       * Give obvious character/enemy cards priority.
+       */
+      if (
+        /character|npc|enemy|boss|person|creature|monster|ally|companion/i
+          .test(type)
+      ) {
+        score += 4;
+      }
+
+      /*
+       * Give cards containing capability information
+       * extra priority.
+       */
+      if (
+        /strength|speed|power|ability|abilities|skill|combat|durability|weapon|magic|technique|weakness|resistance|energy|stamina|esper/i
+          .test(entry)
+      ) {
+        score += 2;
+      }
+
+      scoredMatches.push({
+        card,
+        score
+      });
+    }
+
+    scoredMatches
+      .sort(
+        (a, b) =>
+          b.score - a.score
+      )
+      .slice(
+        0,
+        MAX_ACTIVE_CARDS
+      )
+      .forEach(
+        ({ card }) => {
+          state.arcCombatCards[
+            String(card.id)
+          ] = ACTION;
+        }
+      );
+  }
+
+  /*
+   * Forget cards that have not been relevant for a while.
+   */
+  for (
+    const id of
+    Object.keys(state.arcCombatCards)
+  ) {
+    const lastSeen =
+      state.arcCombatCards[id];
+
+    if (
+      ACTION - lastSeen >
+      CARD_MEMORY_ACTIONS
+    ) {
+      delete state.arcCombatCards[id];
+    }
+  }
+
+  const activeCards =
+    combatActive
+      ? cards.filter(
+          card =>
+            card &&
+            Object.prototype
+              .hasOwnProperty.call(
+                state.arcCombatCards,
+                String(card.id)
+              )
+        )
+      : [];
+
+  /*
+   * ============================================================
+   * PRESERVE RELEVANT COMBAT STORY CARDS
+   * ============================================================
+   *
+   * This creates a bounded copy of currently relevant Story Card
+   * information.
+   *
+   * That means an enemy's combat profile remains available even
+   * if ordinary World Lore gets pushed out by context limits.
+   */
+
+  let relevantCardsBlock = "";
+  let remainingCardChars =
+    MAX_CARD_CONTEXT_CHARS;
+
+  if (
+    activeCards.length &&
+    remainingCardChars > 0
+  ) {
+    const pieces = [];
+
+    for (
+      const card of
+      activeCards.slice(
+        0,
+        MAX_ACTIVE_CARDS
+      )
+    ) {
+      if (
+        remainingCardChars <= 0
+      ) {
+        break;
+      }
+
+      const keys =
+        getKeys(card)
+          .join(", ");
+
+      const label =
+        keys
+          ? `Story Card (${keys})`
+          : `Story Card ${card.id}`;
+
+      const fullEntry =
+        String(
+          card.entry || ""
+        ).trim();
+
+      if (!fullEntry) {
+        continue;
+      }
+
+      const prefix =
+        `\n${label}:\n`;
+
+      const room =
+        Math.max(
+          0,
+          remainingCardChars -
+          prefix.length
+        );
+
+      if (room <= 0) {
+        break;
+      }
+
+      const entry =
+        fullEntry.slice(
+          0,
+          room
+        );
+
+      const piece =
+        prefix + entry;
+
+      pieces.push(piece);
+
+      remainingCardChars -=
+        piece.length;
+    }
+
+    if (pieces.length) {
+      relevantCardsBlock = `
+[ARC RELEVANT STORY CARDS]
+
+These are relevant Story Card facts for characters or entities currently involved in combat.
+
+Use them as established baseline information, especially when determining enemy:
+- Power.
+- Speed.
+- Durability.
+- Skill.
+- Abilities.
+- Equipment.
+- Techniques.
+- Weaknesses.
+- Resistances.
+- Energy.
+- Limitations.
+
+Recent injuries, fatigue, energy use, equipment changes, transformations, and other current conditions still override baseline values when applicable.
+
+${pieces.join("\n")}
+
+[/ARC RELEVANT STORY CARDS]
+`;
+    }
+  }
+
+  /*
+   * ============================================================
+   * AUTOMATIC LOOP DETECTION
+   * ============================================================
+   */
+
+  const recentAI =
+    historyList
+      .filter(
+        action =>
+          action &&
+          action.type === "continue" &&
+          action.text
+      )
+      .slice(-2);
+
+  let loopRisk = false;
+
+  if (
+    recentAI.length === 2
+  ) {
+    const first =
+      new Set(
+        normalizeWords(
+          recentAI[0].text
+        )
+      );
+
+    const second =
+      new Set(
+        normalizeWords(
+          recentAI[1].text
+        )
+      );
+
+    if (
+      first.size >= 12 &&
+      second.size >= 12
+    ) {
+      let shared = 0;
+
+      for (
+        const word of first
+      ) {
+        if (
+          second.has(word)
+        ) {
+          shared++;
+        }
+      }
+
+      const union =
+        first.size +
+        second.size -
+        shared;
+
+      const similarity =
+        union
+          ? shared / union
+          : 0;
+
+      loopRisk =
+        similarity >= 0.72;
+    }
+  }
+
+  /*
+   * ============================================================
+   * BUILD DIRECTIVES
+   * ============================================================
+   */
+
+  let directives =
+    CORE_RULES +
+    "\n" +
+    ANTI_REPEAT;
+
+  if (combatActive) {
+    directives +=
+      "\n" +
+      COMBAT_RULES;
+  }
+
+  if (relevantCardsBlock) {
+    directives +=
+      "\n" +
+      relevantCardsBlock;
+  }
+
+  if (loopRisk) {
+    directives +=
+      "\n" +
+      LOOP_BREAKER;
+  }
+
+  /*
+   * ============================================================
+   * CONTEXT PLACEMENT
+   * ============================================================
+   *
+   * Order:
+   *
+   * Plot Essentials / Memory
+   * ↓
+   * Combat and outcome rules
+   * ↓
+   * Relevant active Story Cards
+   * ↓
+   * Recent story
+   * ↓
+   * Latest action
+   *
+   * This keeps player baseline information available while
+   * keeping the newest narrative closest to generation.
+   */
+
+  const cleanedText =
+    stripArcBlocks(text);
+
+  const memoryLength =
+    Math.min(
+      info.memoryLength || 0,
+      cleanedText.length
+    );
+
+  /*
+   * AI Dungeon's memory / Plot Essentials area is protected
+   * from our story-history trimming.
+   */
+  const memoryPart =
+    memoryLength
+      ? cleanedText.slice(
+          0,
+          memoryLength
+        )
+      : "";
+
+  let storyPart =
+    memoryLength
+      ? cleanedText.slice(
+          memoryLength
+        )
+      : cleanedText;
 
   const maxChars =
     info.maxChars ||
-    text.length + directives.length + 1000;
+    (
+      cleanedText.length +
+      directives.length +
+      1000
+    );
 
-  const available = Math.max(
-    0,
-    maxChars - memoryPart.length - directives.length - 2
-  );
+  const separators = 2;
 
-  storyPart = available > 0
-    ? storyPart.slice(-available)
-    : "";
+  const availableStoryChars =
+    Math.max(
+      0,
+      maxChars -
+        memoryPart.length -
+        directives.length -
+        separators
+    );
+
+  /*
+   * If trimming becomes necessary, preserve newest history
+   * rather than old story text.
+   */
+  storyPart =
+    availableStoryChars > 0
+      ? storyPart.slice(
+          -availableStoryChars
+        )
+      : "";
 
   return {
-    text: `${memoryPart}${storyPart}\n${directives}`
+    text:
+      [
+        memoryPart,
+        directives,
+        storyPart
+      ]
+        .filter(Boolean)
+        .join("\n")
   };
 };
 
