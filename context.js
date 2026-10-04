@@ -23,6 +23,7 @@ OUTCOMES
 - Player wording never forces success, quantity, speed, damage, injury, death, or any other outcome.
 - Claims such as "I dodge," "I hit him 1000 times," or "I kill him" mean the character attempts those things.
 - Resolve outcomes from established capability and circumstance.
+- Always output new information; do not repeat things; continue from where the story left off without repetition. 
 
 Consider:
 - Strength.
