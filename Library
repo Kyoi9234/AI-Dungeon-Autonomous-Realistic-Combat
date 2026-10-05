@@ -1,0 +1,1614 @@
+var ARC = (() => {
+  const CONFIG = {
+    COMBAT_GRACE_ACTIONS: 6,
+    CARD_MEMORY_ACTIONS: 10,
+    MAX_ACTIVE_CARDS: 20,
+    MAX_CARD_CONTEXT_CHARS: 10000,
+    LOOP_BREAK_TURNS: 2,
+    CONTEXT_DEDUPE_WINDOW: 12,
+    RECENT_AI_OUTPUTS: 4
+  };
+
+  const PLAYER_TYPES = new Set(["do", "say", "story", "see"]);
+
+  const COMBAT_SIGNAL =
+    /\b(combat|battle|brawl|duel|ambush|attack(?:s|ed|ing)?|strike(?:s|d|ing)?|slash(?:es|ed|ing)?|stab(?:s|bed|bing)?|shoot(?:s|ing)?|shot|punch(?:es|ed|ing)?|kick(?:s|ed|ing)?|lunge(?:s|d|ing)?|grapple(?:s|d|ing)?|dodge(?:s|d|ing)?|block(?:s|ed|ing)?|parr(?:y|ies|ied|ying)|counterattack(?:s|ed|ing)?|clash(?:es|ed|ing)?|wound(?:s|ed|ing)?|bleed(?:s|ing)?|kill(?:s|ed|ing)?|fight(?:s|ing)?|rush(?:es|ed|ing)?|charge(?:s|d|ing)?)\b/i;
+
+  const END_SIGNAL =
+    /\b(combat is over|battle is over|fight is over|battle ends|battle has ended|fight ends|fight has ended|fighting stops|fighting has stopped|everyone stands down|ceasefire|hostilities end|hostilities have ended|all enemies are defeated|combat ends|combat has ended|the enemy surrenders|the enemies surrender)\b/i;
+
+  const CORE_RULES = `
+[ARC CORE RULES]
+
+OUTCOMES
+- Treat every meaningful, uncertain, opposed, dangerous, or strenuous action as an attempt, not a guaranteed result.
+- Player wording never forces success, quantity, speed, damage, injury, death, or any other outcome.
+- Claims such as "I dodge," "I hit him 1000 times," "I speed blitz him," or "I kill him" describe attempts. Resolve what actually happens.
+- Declared quantities and combo lengths are also attempts. A claim of hundreds or thousands of attacks only occurs if established speed, stamina, time, opportunity, and enemy resistance make it possible.
+- Resolve outcomes from established capability and circumstance, not protagonist status or dramatic convenience.
+- Trivial, safe, uncontested actions should not randomly fail.
+
+POWER & CAPABILITY SOURCES
+- For the PLAYER, treat Plot Essentials as the primary baseline source for established strength, speed, reactions, agility, durability, intelligence, combat skill, experience, powers, techniques, equipment, weapons, transformations, resistances, weaknesses, energy reserves, special conditions, and limitations.
+- For ENEMIES, ALLIES, and NPCs, treat relevant Story Cards as the primary baseline source when available.
+- Evaluate individually described combatants individually. Do not flatten a group into generic identical fighters.
+- Never automatically scale the player to enemies or enemies to the player. Preserve genuine power differences.
+
+CURRENT CONDITION OVERRIDES BASELINE
+- Plot Essentials and Story Cards establish baseline capability; recent story events establish current condition.
+- Apply injuries, blood loss, exhaustion, energy expenditure, damaged or lost equipment, broken weapons, transformations, temporary boosts/debuffs, environment, positioning, and recent consequences.
+- A normally fast fighter with badly injured legs is not currently at full healthy speed.
+- A normally powerful fighter who is exhausted or nearly out of energy performs according to that weakened state.
+
+SOURCE PRIORITY
+1. Current established condition and recent consequences.
+2. Explicit Plot Essentials and relevant Story Cards.
+3. Other clearly established story information.
+4. Conservative inference only when necessary.
+- Never invent a power level, immunity, weakness, ability, or rescue because it would be convenient.
+
+SPEED BLITZING
+- Any sufficiently faster combatant may attempt to speed blitz another character.
+- A true speed blitz requires a large enough speed/reaction gap that the slower character cannot reliably track or react before the action occurs.
+- Declaring a speed blitz does not make it succeed. Compare speed, reactions, awareness, prediction abilities, positioning, injuries, fatigue, energy, surprise, and other relevant circumstances.
+
+FATIGUE, ENERGY, AND INJURY
+- Fatigue persists until credible recovery.
+- High-output actions consume appropriate stamina or setting-specific energy unless explicitly established otherwise.
+- Injuries persist until credibly treated or healed and can impair movement, strength, speed, senses, concentration, defense, stamina, and survival.
+- Damage accumulates. Repeated severe trauma, blood loss, organ damage, or exhaustion may incapacitate or kill even when no single injury was instantly lethal.
+
+NO PLOT ARMOR
+- No character has plot armor: player, ally, enemy, companion, rival, hero, villain, mentor, or major NPC.
+- Anyone may miss, fail, make mistakes, be outsmarted, be overwhelmed, be injured, suffer permanent consequences, lose, become incapacitated, or die when cause and effect justify it.
+- Narrative importance, unfinished plans, or future usefulness do not protect anyone.
+- Do not invent convenient misses, rescues, interruptions, reinforcements, power-ups, abilities, regeneration, or miraculous survival solely to preserve a character.
+- Do not force failure, injury, or death merely for drama either.
+- If consequences alter the intended plot, continue from the new reality rather than undoing them.
+
+NUMBERS & OPPOSITION
+- Multiple competent opponents create real pressure through divided attention, blind spots, flanking, crossfire, coordination, reduced recovery time, and greater fatigue.
+- Several weaker opponents may overwhelm a stronger fighter through numbers and teamwork.
+- Do not weaken groups merely because the player is the protagonist.
+
+NON-COMBAT
+- Apply the same attempt-and-consequence logic to meaningful uncertain actions outside combat, including persuasion, deception, stealth, escape, climbing, tracking, investigation, driving, piloting, survival, crafting, and difficult physical or mental tasks.
+
+[/ARC CORE RULES]
+`;
+
+  const COMBAT_RULES = `
+[ARC COMBAT RULES]
+
+POWER COMPARISON
+- Before resolving an important exchange, compare established capabilities.
+- Use Plot Essentials as the player's primary baseline, relevant Story Cards as enemy/NPC baselines, then apply current injuries, fatigue, energy, equipment, transformations, positioning, terrain, surprise, numbers, and temporary effects.
+- Meaningful advantages in speed, strength, durability, skill, experience, range, or special abilities should matter without guaranteeing victory.
+
+AUTONOMY & INITIATIVE
+- Combat is fast, dangerous, tactical, autonomous, and not rigidly turn-based.
+- Any capable combatant may attack first, interrupt, dodge, evade, block, parry, counterattack, reposition, pursue, retreat, intercept, or exploit an opening when plausible.
+- Initiative and reactions depend on awareness, speed, reactions, surprise, position, preparation, skill, injuries, fatigue, energy, and circumstances.
+- None of these actions automatically succeed.
+
+TACTICS
+- Combatants think strategically according to intelligence, personality, training, experience, knowledge, and goals.
+- They may feint, bait, flank, control distance, use cover, exploit terrain, target weaknesses, conserve or spend resources, adapt to observed abilities, prepare ambushes, create hazards, set traps, lure opponents, retreat, pursue, or change tactics.
+- Do not invent powers, equipment, or knowledge that were never established.
+
+GROUP COMBAT
+- Enemies do not need to attack one at a time. Multiple combatants may attack simultaneously, in coordinated waves, or from different directions.
+- Groups may flank, surround, use crossfire, distract, perform pincer attacks, combine abilities, apply staggered pressure, set traps, suppress movement, and create openings for one another.
+- Numerical advantage must materially affect attention, defense, stamina, positioning, awareness, and opportunities to counterattack.
+
+PLAYER-CENTERED GROUP BATTLE FOCUS
+- In 2v2, 3v2, 3v3, 4v4, or larger battles, keep the PLAYER'S immediate fight as the primary foreground focus.
+- Primarily narrate the player's opponent, attacks, defenses, nearby threats, and developments that alter the player's situation.
+- Other combatants continue fighting in the background. They do not freeze, disappear, or wait because narration is focused on the player.
+- Briefly reveal meaningful background developments through sounds, glimpses, impacts, dialogue, major techniques, serious injuries, defeated fighters, calls for help, or someone entering the player's fight.
+
+AUTOMATIC OPPONENT ASSIGNMENT
+- When group combat begins, combatants should naturally identify available opponents.
+- When practical, each fighter initially engages an opposing combatant who is not already fully occupied.
+- Do not make every enemy attack the player by default when other valid opponents are present.
+- Do not make all allies pile onto one enemy while ignoring other threats without a tactical reason.
+- Combatants may choose the closest suitable opponent, greatest immediate threat, someone attacking them or an ally, a favorable matchup, or an unoccupied opponent.
+- These are not permanent target locks. Combatants may switch opponents when circumstances change.
+
+UNEVEN GROUPS AND FREE FIGHTERS
+- If one side has extra fighters, surplus combatants may double-team, flank, provide ranged support, protect allies, intercept attacks, prepare traps, control terrain, prevent escape, or assist a struggling teammate.
+- When a fighter defeats, incapacitates, drives away, or otherwise finishes with their opponent, they become tactically free.
+- A free ally may help the player or another ally, protect someone, intercept an enemy, or reposition.
+- A free enemy may attack the player, assist another enemy, flank, double-team, intercept, or pursue a wounded target.
+- Matchups may naturally evolve as fighters are defeated or freed.
+
+PLAYER AFTER WINNING A MATCHUP
+- If the player defeats their current opponent, recognize that the player is now free.
+- Do not force the player's next voluntary attack unless their stated intent already establishes it.
+- Present the ongoing battlefield so the player can choose whether to help an ally, attack another enemy, protect someone, pursue, retreat, reposition, or take another action.
+- Enemies remain free to react to the newly available player.
+
+DESPERATION
+- A combatant who reasonably believes death, capture, incapacitation, or decisive defeat is imminent may escalate immediately.
+- They may use their strongest established attacks, transformations, ultimate techniques, dangerous weapons, rare resources, last-resort tactics, or large amounts of remaining energy.
+- They do not need to irrationally save powerful abilities while facing death. Personality still matters.
+
+CONTINUOUS COMBAT
+- Do not force one-action-per-turn exchanges.
+- While momentum, stamina, energy, position, and opportunity remain, fighters may chain attacks, movement, defenses, counters, grapples, projectiles, powers, environmental attacks, and pursuit into fluid exchanges.
+- A miss, block, dodge, or counter does not automatically end a combination. Counters may themselves be countered, interrupted, or anticipated.
+- Maintain fast anime-style pressure without making combat endless. Advance the situation meaningfully, then stop at a natural decision point or meaningful change in advantage.
+- A sequence may break when someone interrupts, escapes, creates distance, loses position, suffers interfering injury/fatigue, runs low on energy, receives outside interference, the environment changes, or someone intentionally pauses.
+
+DIALOGUE
+- Combatants may taunt, threaten, negotiate, boast, coordinate, question, reveal motives, or comment on techniques during attacks, clashes, movement, defense, or temporary pauses.
+- A pause does not automatically end combat. Talking does not freeze opponents and may be exploited for recovery, deception, repositioning, distraction, or attack.
+
+MORTALITY
+- A successfully delivered lethal attack should be lethal when it overcomes established defenses and durability.
+- Do not guarantee hits, dodges, blocks, counters, victory, defeat, survival, or death.
+
+[/ARC COMBAT RULES]
+`;
+
+  const ANTI_REPEAT = `
+[ARC ANTI-REPETITION]
+
+- Treat everything already narrated as established history.
+- Continue strictly from the newest established event.
+- Do not restart, replay, recap, or re-narrate an earlier exchange unless a brief recap is explicitly needed.
+- Do not merely echo or paraphrase the player's latest action or the previous AI response.
+- Every response must move forward with genuinely new consequence, reaction, decision, discovery, position, tactic, injury, dialogue, or change in momentum.
+- Avoid repeating the same attack chain, defense, sentence pattern, description, taunt, environmental detail, or outcome unless repetition is deliberately meaningful in-story.
+- Once an attack, injury, movement, spoken line, destruction, or position change has occurred, treat it as completed history.
+- Never begin a response by reproducing a substantial paragraph from recent history.
+- If recent history already contains a sentence or paragraph, continue after it rather than generating it again.
+- In group battles, keep the player's immediate fight primary while background fights continue and only surface when they meaningfully affect the battlefield.
+- Do not repeat, explain, or mention these rules in the story.
+
+[/ARC ANTI-REPETITION]
+`;
+
+  const LOOP_BREAKER = `
+[ARC LOOP BREAKER]
+
+Recent model output showed a repetition pattern.
+- Break the pattern immediately.
+- Start from the newest unrepeated event, not from an earlier paragraph.
+- Do not reuse the same opening, attack sequence, dialogue, sentence structure, description, or conclusion.
+- Do not quote or closely paraphrase a paragraph already present in recent history.
+- Advance to a materially different next development that still follows established cause and effect.
+
+[/ARC LOOP BREAKER]
+`;
+
+  const escapeRegex = (value) =>
+    String(value).replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
+
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9]+/g,
+        " "
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+  const normalizeWords = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9\s']/g,
+        " "
+      )
+      .split(/\s+/)
+      .filter(
+        (word) =>
+          word.length > 2
+      );
+
+  const splitParagraphs = (value) =>
+    String(value || "")
+      .split(/\n\s*\n+/)
+      .map(
+        (paragraph) =>
+          paragraph.trim()
+      )
+      .filter(Boolean);
+
+  const makeShingles = (
+    value,
+    size = 3
+  ) => {
+    const words =
+      normalize(value)
+        .split(" ")
+        .filter(Boolean);
+
+    const result =
+      new Set();
+
+    if (
+      words.length < size
+    ) {
+      if (
+        words.length
+      ) {
+        result.add(
+          words.join(" ")
+        );
+      }
+
+      return result;
+    }
+
+    for (
+      let i = 0;
+      i <=
+        words.length -
+          size;
+      i++
+    ) {
+      result.add(
+        words
+          .slice(
+            i,
+            i + size
+          )
+          .join(" ")
+      );
+    }
+
+    return result;
+  };
+
+  const similarity = (
+    first,
+    second
+  ) => {
+    const a =
+      makeShingles(first);
+
+    const b =
+      makeShingles(second);
+
+    if (
+      !a.size ||
+      !b.size
+    ) {
+      return 0;
+    }
+
+    let shared =
+      0;
+
+    for (
+      const item of a
+    ) {
+      if (
+        b.has(item)
+      ) {
+        shared++;
+      }
+    }
+
+    return (
+      shared /
+      Math.min(
+        a.size,
+        b.size
+      )
+    );
+  };
+
+  const isDuplicate = (
+    first,
+    second,
+    threshold = 0.84,
+    minLength = 90
+  ) => {
+    const a =
+      normalize(first);
+
+    const b =
+      normalize(second);
+
+    if (
+      !a ||
+      !b
+    ) {
+      return false;
+    }
+
+    if (
+      a === b &&
+      a.length >= 35
+    ) {
+      return true;
+    }
+
+    if (
+      a.length <
+        minLength ||
+      b.length <
+        minLength
+    ) {
+      return false;
+    }
+
+    return (
+      similarity(
+        first,
+        second
+      ) >= threshold
+    );
+  };
+
+  const hasDuplicateParagraph = (
+    firstText,
+    secondText,
+    threshold = 0.86
+  ) => {
+    const first =
+      splitParagraphs(
+        firstText
+      );
+
+    const second =
+      splitParagraphs(
+        secondText
+      );
+
+    for (
+      const a of first
+    ) {
+      for (
+        const b of second
+      ) {
+        if (
+          isDuplicate(
+            a,
+            b,
+            threshold,
+            100
+          )
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const stripArcBlocks = (value) =>
+    String(value || "")
+      .replace(
+        /\n?\[ARC CORE RULES\][\s\S]*?\[\/ARC CORE RULES\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC COMBAT RULES\][\s\S]*?\[\/ARC COMBAT RULES\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC ANTI-REPETITION\][\s\S]*?\[\/ARC ANTI-REPETITION\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC LOOP BREAKER\][\s\S]*?\[\/ARC LOOP BREAKER\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC RELEVANT STORY CARDS\][\s\S]*?\[\/ARC RELEVANT STORY CARDS\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC TURN DIRECTIVE\][\s\S]*?\[\/ARC TURN DIRECTIVE\]\n?/g,
+        "\n"
+      );
+
+  const getKeys = (card) => {
+    if (
+      !card ||
+      card.keys == null
+    ) {
+      return [];
+    }
+
+    if (
+      Array.isArray(
+        card.keys
+      )
+    ) {
+      return card.keys
+        .map(
+          (key) =>
+            String(key).trim()
+        )
+        .filter(Boolean);
+    }
+
+    return String(
+      card.keys
+    )
+      .split(
+        /[,;\n]/
+      )
+      .map(
+        (key) =>
+          key.trim()
+      )
+      .filter(Boolean);
+  };
+
+  const keyAppears = (
+    source,
+    key
+  ) => {
+    if (
+      !source ||
+      !key
+    ) {
+      return false;
+    }
+
+    const trimmed =
+      String(key).trim();
+
+    if (
+      trimmed.length < 2
+    ) {
+      return false;
+    }
+
+    if (
+      /^[a-z0-9_' -]+$/i.test(
+        trimmed
+      )
+    ) {
+      const pattern =
+        new RegExp(
+          `(^|[^a-z0-9_])${escapeRegex(trimmed)}([^a-z0-9_]|$)`,
+          "i"
+        );
+
+      return pattern.test(
+        source
+      );
+    }
+
+    return source
+      .toLowerCase()
+      .includes(
+        trimmed.toLowerCase()
+      );
+  };
+
+  const cardAlreadyInContext = (
+    card,
+    contextText
+  ) => {
+    if (
+      !card ||
+      !card.entry ||
+      !contextText
+    ) {
+      return false;
+    }
+
+    const entry =
+      normalize(
+        card.entry
+      );
+
+    const context =
+      normalize(
+        contextText
+      );
+
+    if (
+      !entry ||
+      !context
+    ) {
+      return false;
+    }
+
+    if (
+      entry.length <= 700
+    ) {
+      return context.includes(
+        entry
+      );
+    }
+
+    const fingerprintSize =
+      180;
+
+    const start =
+      entry.slice(
+        0,
+        fingerprintSize
+      );
+
+    const middleStart =
+      Math.max(
+        0,
+        Math.floor(
+          entry.length / 2
+        ) -
+          Math.floor(
+            fingerprintSize /
+              2
+          )
+      );
+
+    const middle =
+      entry.slice(
+        middleStart,
+        middleStart +
+          fingerprintSize
+      );
+
+    const end =
+      entry.slice(
+        Math.max(
+          0,
+          entry.length -
+            fingerprintSize
+        )
+      );
+
+    let matches =
+      0;
+
+    if (
+      start &&
+      context.includes(start)
+    ) {
+      matches++;
+    }
+
+    if (
+      middle &&
+      context.includes(
+        middle
+      )
+    ) {
+      matches++;
+    }
+
+    if (
+      end &&
+      context.includes(end)
+    ) {
+      matches++;
+    }
+
+    return matches >= 2;
+  };
+
+  const dedupeContextHistory = (
+    value
+  ) => {
+    const paragraphs =
+      splitParagraphs(
+        value
+      );
+
+    const kept =
+      [];
+
+    const recent =
+      [];
+
+    for (
+      const paragraph of
+      paragraphs
+    ) {
+      const norm =
+        normalize(
+          paragraph
+        );
+
+      const substantial =
+        norm.length >= 100;
+
+      const duplicate =
+        substantial &&
+        recent.some(
+          (previous) =>
+            isDuplicate(
+              paragraph,
+              previous,
+              0.92,
+              100
+            )
+        );
+
+      if (
+        duplicate
+      ) {
+        continue;
+      }
+
+      kept.push(
+        paragraph
+      );
+
+      if (
+        substantial
+      ) {
+        recent.push(
+          paragraph
+        );
+
+        if (
+          recent.length >
+            CONFIG.CONTEXT_DEDUPE_WINDOW
+        ) {
+          recent.shift();
+        }
+      }
+    }
+
+    return kept.join(
+      "\n\n"
+    );
+  };
+
+  const prepareState = () => {
+    const action =
+      info.actionCount || 0;
+
+    if (
+      typeof state.arcLastActionCount ===
+        "number" &&
+      action <
+        state.arcLastActionCount
+    ) {
+      delete state.arcCombatUntil;
+      delete state.arcCombatCards;
+      delete state.arcTurnDirective;
+      delete state.arcPreviousPlayerInput;
+      delete state.arcLoopBreakTurns;
+      delete state.arcForceLoopBreak;
+    }
+
+    state.arcLastActionCount =
+      action;
+
+    state.arcCombatCards =
+      state.arcCombatCards ||
+      {};
+
+    if (
+      state.arcForceLoopBreak
+    ) {
+      state.arcLoopBreakTurns =
+        Math.max(
+          state.arcLoopBreakTurns ||
+            0,
+          CONFIG.LOOP_BREAK_TURNS
+        );
+
+      state.arcForceLoopBreak =
+        false;
+    }
+
+    return action;
+  };
+
+  const combatActive = (
+    action =
+      info.actionCount || 0
+  ) =>
+    typeof state.arcCombatUntil ===
+      "number" &&
+    state.arcCombatUntil >=
+      action;
+
+  const buildTurnDirective = (
+    inputText,
+    wasRepeated,
+    activeCombat
+  ) => {
+    const parts = [
+      "Resolve the newest player input exactly once. Treat declared outcomes, quantities, and finishing claims as attempts. Do not echo or paraphrase the player's wording; begin with a new reaction, consequence, or development."
+    ];
+
+    if (
+      wasRepeated
+    ) {
+      parts.push(
+        "The player intentionally repeated a similar action. Resolve it as a NEW attempt from the CURRENT position, injuries, fatigue, energy, defenses, and reactions. Do not reuse the previous narration or outcome wording."
+      );
+    }
+
+    if (
+      activeCombat
+    ) {
+      parts.push(
+        "Combat remains active and autonomous. Other capable combatants may react, interrupt, defend, counter, reposition, or continue their own fights while this attempt is resolved."
+      );
+    }
+
+    if (
+      /\b(?:\d{2,}|hundreds?|thousands?|million|billion)\b/i
+        .test(
+          inputText
+        )
+    ) {
+      parts.push(
+        "Any declared large quantity or repetition count is aspirational, not guaranteed; only narrate the amount physically achieved before interruption, exhaustion, defense, or changing circumstances stop it."
+      );
+    }
+
+    return parts.join(
+      " "
+    );
+  };
+
+  const trackRelevantCards = (
+    active
+  ) => {
+    const cards =
+      Array.isArray(
+        storyCards
+      )
+        ? storyCards
+        : [];
+
+    const historyList =
+      Array.isArray(
+        history
+      )
+        ? history
+        : [];
+
+    const action =
+      info.actionCount || 0;
+
+    if (
+      !active ||
+      !cards.length
+    ) {
+      return cards;
+    }
+
+    const recentCombatText =
+      historyList
+        .slice(-6)
+        .map(
+          (item) =>
+            (
+              item &&
+              item.text
+            ) ||
+            ""
+        )
+        .join("\n");
+
+    const scored =
+      [];
+
+    for (
+      const card of cards
+    ) {
+      if (
+        !card ||
+        !card.entry
+      ) {
+        continue;
+      }
+
+      const keys =
+        getKeys(card);
+
+      const matchingKeys =
+        keys.filter(
+          (key) =>
+            keyAppears(
+              recentCombatText,
+              key
+            )
+        );
+
+      if (
+        !matchingKeys.length
+      ) {
+        continue;
+      }
+
+      const entry =
+        String(
+          card.entry
+        );
+
+      const type =
+        String(
+          card.type ||
+            ""
+        );
+
+      let score =
+        matchingKeys.length *
+        3;
+
+      if (
+        /character|npc|enemy|boss|person|creature|monster|ally|companion/i
+          .test(type)
+      ) {
+        score += 4;
+      }
+
+      if (
+        /strength|speed|power|ability|abilities|skill|combat|durability|weapon|magic|technique|weakness|resistance|energy|stamina|esper|haki|devil fruit/i
+          .test(entry)
+      ) {
+        score += 2;
+      }
+
+      scored.push({
+        card,
+        score
+      });
+    }
+
+    scored
+      .sort(
+        (a, b) =>
+          b.score -
+          a.score
+      )
+      .slice(
+        0,
+        CONFIG.MAX_ACTIVE_CARDS
+      )
+      .forEach(
+        ({ card }) => {
+          state.arcCombatCards[
+            String(card.id)
+          ] = action;
+        }
+      );
+
+    for (
+      const id of
+      Object.keys(
+        state.arcCombatCards
+      )
+    ) {
+      if (
+        action -
+          state.arcCombatCards[
+            id
+          ] >
+        CONFIG.CARD_MEMORY_ACTIONS
+      ) {
+        delete state
+          .arcCombatCards[id];
+      }
+    }
+
+    return cards;
+  };
+
+  const buildRelevantCardsBlock = (
+    cards,
+    cleanedText,
+    active
+  ) => {
+    if (
+      !active
+    ) {
+      return "";
+    }
+
+    const activeCards =
+      cards.filter(
+        (card) =>
+          card &&
+          Object.prototype
+            .hasOwnProperty
+            .call(
+              state.arcCombatCards,
+              String(card.id)
+            )
+      );
+
+    if (
+      !activeCards.length
+    ) {
+      return "";
+    }
+
+    let remaining =
+      CONFIG.MAX_CARD_CONTEXT_CHARS;
+
+    const pieces =
+      [];
+
+    for (
+      const card of
+      activeCards.slice(
+        0,
+        CONFIG.MAX_ACTIVE_CARDS
+      )
+    ) {
+      if (
+        remaining <= 0
+      ) {
+        break;
+      }
+
+      if (
+        cardAlreadyInContext(
+          card,
+          cleanedText
+        )
+      ) {
+        continue;
+      }
+
+      const keys =
+        getKeys(
+          card
+        ).join(", ");
+
+      const label =
+        keys
+          ? `Story Card (${keys})`
+          : `Story Card ${card.id}`;
+
+      const fullEntry =
+        String(
+          card.entry ||
+            ""
+        ).trim();
+
+      if (
+        !fullEntry
+      ) {
+        continue;
+      }
+
+      const prefix =
+        `\n${label}:\n`;
+
+      const room =
+        Math.max(
+          0,
+          remaining -
+            prefix.length
+        );
+
+      if (
+        room <= 0
+      ) {
+        break;
+      }
+
+      const piece =
+        prefix +
+        fullEntry.slice(
+          0,
+          room
+        );
+
+      pieces.push(
+        piece
+      );
+
+      remaining -=
+        piece.length;
+    }
+
+    if (
+      !pieces.length
+    ) {
+      return "";
+    }
+
+    return `
+[ARC RELEVANT STORY CARDS]
+
+These Story Card facts are relevant to characters or entities currently involved in combat. Use them as established baseline information for power, speed, durability, skill, abilities, equipment, techniques, weaknesses, resistances, energy, and limitations. Recent injuries, fatigue, energy use, equipment changes, transformations, positioning, and other current conditions override baseline values when applicable.
+
+${pieces.join("\n")}
+
+[/ARC RELEVANT STORY CARDS]
+`;
+  };
+
+  const recentLoopRisk =
+    () => {
+      const historyList =
+        Array.isArray(
+          history
+        )
+          ? history
+          : [];
+
+      const recentAI =
+        historyList
+          .filter(
+            (item) =>
+              item &&
+              item.type ===
+                "continue" &&
+              item.text
+          )
+          .slice(-2);
+
+      if (
+        recentAI.length <
+          2
+      ) {
+        return false;
+      }
+
+      if (
+        hasDuplicateParagraph(
+          recentAI[0].text,
+          recentAI[1].text,
+          0.84
+        )
+      ) {
+        return true;
+      }
+
+      return (
+        similarity(
+          recentAI[0].text,
+          recentAI[1].text
+        ) >= 0.60
+      );
+    };
+
+  const onInput = (
+    text
+  ) => {
+    const action =
+      prepareState();
+
+    const input =
+      String(
+        text || ""
+      );
+
+    if (
+      END_SIGNAL.test(
+        input
+      )
+    ) {
+      state.arcCombatUntil =
+        -1;
+
+      state.arcCombatCards =
+        {};
+    } else if (
+      COMBAT_SIGNAL.test(
+        input
+      )
+    ) {
+      state.arcCombatUntil =
+        action +
+        CONFIG.COMBAT_GRACE_ACTIONS;
+    } else if (
+      combatActive(
+        action
+      )
+    ) {
+      state.arcCombatUntil =
+        Math.max(
+          state.arcCombatUntil,
+          action + 2
+        );
+    }
+
+    const currentNorm =
+      normalize(
+        input
+      );
+
+    const previousNorm =
+      normalize(
+        state.arcPreviousPlayerInput ||
+          ""
+      );
+
+    const wasRepeated =
+      currentNorm.length >= 20 &&
+      currentNorm ===
+        previousNorm;
+
+    state.arcTurnDirective =
+      buildTurnDirective(
+        input,
+        wasRepeated,
+        combatActive(
+          action
+        )
+      );
+
+    state.arcPreviousPlayerInput =
+      input;
+
+    if (
+      wasRepeated
+    ) {
+      state.arcLoopBreakTurns =
+        Math.max(
+          state.arcLoopBreakTurns ||
+            0,
+          1
+        );
+    }
+
+    return {
+      text
+    };
+  };
+
+  const onContext = (
+    text
+  ) => {
+    const action =
+      prepareState();
+
+    const historyList =
+      Array.isArray(
+        history
+      )
+        ? history
+        : [];
+
+    const newest =
+      historyList.length
+        ? historyList[
+            historyList.length -
+              1
+          ]
+        : null;
+
+    if (
+      newest &&
+      END_SIGNAL.test(
+        newest.text ||
+          ""
+      )
+    ) {
+      state.arcCombatUntil =
+        -1;
+
+      state.arcCombatCards =
+        {};
+    }
+
+    const active =
+      combatActive(
+        action
+      );
+
+    if (
+      !active &&
+      typeof state.arcCombatUntil ===
+        "number" &&
+      state.arcCombatUntil <
+        action
+    ) {
+      state.arcCombatCards =
+        {};
+    }
+
+    const cleanedText =
+      stripArcBlocks(
+        text
+      );
+
+    const cards =
+      trackRelevantCards(
+        active
+      );
+
+    const cardsBlock =
+      buildRelevantCardsBlock(
+        cards,
+        cleanedText,
+        active
+      );
+
+    let loopRisk =
+      (
+        state.arcLoopBreakTurns ||
+        0
+      ) > 0 ||
+      recentLoopRisk();
+
+    if (
+      (
+        state.arcLoopBreakTurns ||
+        0
+      ) > 0
+    ) {
+      state.arcLoopBreakTurns--;
+    }
+
+    let directives =
+      CORE_RULES +
+      "\n" +
+      ANTI_REPEAT;
+
+    if (
+      active
+    ) {
+      directives +=
+        "\n" +
+        COMBAT_RULES;
+    }
+
+    if (
+      cardsBlock
+    ) {
+      directives +=
+        "\n" +
+        cardsBlock;
+    }
+
+    if (
+      loopRisk
+    ) {
+      directives +=
+        "\n" +
+        LOOP_BREAKER;
+    }
+
+    const latestIsPlayer =
+      newest &&
+      PLAYER_TYPES.has(
+        newest.type
+      );
+
+    const turnDirective =
+      latestIsPlayer &&
+      state.arcTurnDirective
+        ? `\n[ARC TURN DIRECTIVE]\n${state.arcTurnDirective}\n[/ARC TURN DIRECTIVE]\n`
+        : "";
+
+    const memoryLength =
+      Math.min(
+        info.memoryLength ||
+          0,
+        cleanedText.length
+      );
+
+    const memoryPart =
+      memoryLength
+        ? cleanedText.slice(
+            0,
+            memoryLength
+          )
+        : "";
+
+    let storyPart =
+      memoryLength
+        ? cleanedText.slice(
+            memoryLength
+          )
+        : cleanedText;
+
+    storyPart =
+      dedupeContextHistory(
+        storyPart
+      );
+
+    const maxChars =
+      info.maxChars ||
+      (
+        memoryPart.length +
+        directives.length +
+        storyPart.length +
+        turnDirective.length +
+        1000
+      );
+
+    const separators =
+      4;
+
+    const availableStoryChars =
+      Math.max(
+        0,
+        maxChars -
+          memoryPart.length -
+          directives.length -
+          turnDirective.length -
+          separators
+      );
+
+    storyPart =
+      availableStoryChars >
+        0
+        ? storyPart.slice(
+            -availableStoryChars
+          )
+        : "";
+
+    return {
+      text:
+        [
+          memoryPart,
+          directives,
+          storyPart,
+          turnDirective
+        ]
+          .filter(Boolean)
+          .join("\n")
+    };
+  };
+
+  const onOutput = (
+    text
+  ) => {
+    const action =
+      prepareState();
+
+    const original =
+      String(
+        text || ""
+      );
+
+    if (
+      END_SIGNAL.test(
+        original
+      )
+    ) {
+      state.arcCombatUntil =
+        -1;
+
+      state.arcCombatCards =
+        {};
+    } else if (
+      !combatActive(
+        action
+      ) &&
+      COMBAT_SIGNAL.test(
+        original
+      )
+    ) {
+      /*
+       * AI may start a new fight.
+       * AI prose does not endlessly refresh an already-active fight.
+       */
+      state.arcCombatUntil =
+        action +
+        CONFIG.COMBAT_GRACE_ACTIONS;
+    }
+
+    const generatedParagraphs =
+      splitParagraphs(
+        original
+      );
+
+    const internallyCleaned =
+      [];
+
+    let repetitionDetected =
+      false;
+
+    for (
+      const paragraph of
+      generatedParagraphs
+    ) {
+      const duplicate =
+        internallyCleaned.some(
+          (previous) =>
+            isDuplicate(
+              paragraph,
+              previous,
+              0.82,
+              90
+            )
+        );
+
+      if (
+        duplicate
+      ) {
+        repetitionDetected =
+          true;
+
+        continue;
+      }
+
+      internallyCleaned.push(
+        paragraph
+      );
+    }
+
+    let recentAI =
+      Array.isArray(
+        history
+      )
+        ? history
+            .filter(
+              (item) =>
+                item &&
+                item.type ===
+                  "continue" &&
+                item.text
+            )
+            .slice(
+              -CONFIG.RECENT_AI_OUTPUTS
+            )
+        : [];
+
+    if (
+      recentAI.length &&
+      normalize(
+        recentAI[
+          recentAI.length -
+            1
+        ].text
+      ) ===
+        normalize(
+          original
+        )
+    ) {
+      recentAI =
+        recentAI.slice(
+          0,
+          -1
+        );
+    }
+
+    const historicalParagraphs =
+      [];
+
+    for (
+      const item of
+      recentAI
+    ) {
+      historicalParagraphs.push(
+        ...splitParagraphs(
+          item.text
+        )
+      );
+    }
+
+    const novelParagraphs =
+      [];
+
+    for (
+      const paragraph of
+      internallyCleaned
+    ) {
+      const substantial =
+        normalize(
+          paragraph
+        ).length >= 100;
+
+      const duplicateHistory =
+        substantial &&
+        historicalParagraphs.some(
+          (previous) =>
+            isDuplicate(
+              paragraph,
+              previous,
+              0.88,
+              100
+            )
+        );
+
+      if (
+        duplicateHistory
+      ) {
+        repetitionDetected =
+          true;
+
+        continue;
+      }
+
+      novelParagraphs.push(
+        paragraph
+      );
+    }
+
+    const secondPass =
+      [];
+
+    for (
+      const paragraph of
+      novelParagraphs
+    ) {
+      const duplicate =
+        secondPass.some(
+          (previous) =>
+            isDuplicate(
+              paragraph,
+              previous,
+              0.82,
+              90
+            )
+        );
+
+      if (
+        duplicate
+      ) {
+        repetitionDetected =
+          true;
+
+        continue;
+      }
+
+      secondPass.push(
+        paragraph
+      );
+    }
+
+    let cleaned =
+      secondPass
+        .join("\n\n")
+        .trim();
+
+    /*
+     * Never return empty output.
+     *
+     * If the whole generation was recycled, keep only one
+     * de-duplicated paragraph rather than replaying everything.
+     */
+    if (
+      !cleaned &&
+      internallyCleaned.length
+    ) {
+      cleaned =
+        internallyCleaned[
+          internallyCleaned.length -
+            1
+        ].trim();
+
+      repetitionDetected =
+        true;
+    }
+
+    if (
+      !cleaned
+    ) {
+      cleaned =
+        original.trim();
+    }
+
+    if (
+      repetitionDetected
+    ) {
+      state.arcForceLoopBreak =
+        true;
+
+      state.arcLoopBreakTurns =
+        Math.max(
+          state.arcLoopBreakTurns ||
+            0,
+          CONFIG.LOOP_BREAK_TURNS
+        );
+    }
+
+    return {
+      text: cleaned
+    };
+  };
+
+  return {
+    onInput,
+    onContext,
+    onOutput,
+    normalize,
+    similarity,
+    isDuplicate
+  };
+})();
