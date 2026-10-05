@@ -164,7 +164,7 @@ Simple everyday actions are not meant to fail randomly.
 For the current version, you do not need matching code in Library, Input, or Output.
 
 🤖 Recommended AI Models
-This script works best with models that are good at instruction-following, combat, continuity, and handling long context. (ensure optimized context is turned off)
+This script works best with models that are good at instruction-following, combat, continuity, and handling long context. (Works with optimized Context)
 Good options include:
 - Wayfarer Large
 - DeepSeek V4 Pro
