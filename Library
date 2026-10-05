@@ -16,15 +16,15 @@ var ARC = (() => {
 
     LOOP_BREAK_TURNS: 2,
     CONTEXT_DEDUPE_WINDOW: 12,
-    RECENT_AI_OUTPUTS: 4,
-
-    /*
-     * Leave a small safety margin when appending to an
-     * Optimized Context prompt.
-     */
-    OPTIMIZED_CONTEXT_MARGIN: 180
+    RECENT_AI_OUTPUTS: 4
   };
 
+
+  /*
+   * ============================================================
+   * ACTION TYPES
+   * ============================================================
+   */
 
   const PLAYER_TYPES =
     new Set([
@@ -49,13 +49,18 @@ var ARC = (() => {
     /\b(combat is over|battle is over|fight is over|battle ends|battle has ended|fight ends|fight has ended|fighting stops|fighting has stopped|everyone stands down|ceasefire|hostilities end|hostilities have ended|all enemies are defeated|combat ends|combat has ended|the enemy surrenders|the enemies surrender)\b/i;
 
 
+  /*
+   * Detect conversational setups that logically expect
+   * continuation.
+   */
+
   const DIALOGUE_SETUP_SIGNAL =
     /\b(?:here['’]s the thing|the thing is|the truth is|the real truth is|the reason is|there['’]s a reason|you want to know why|want to know why|do you know why|you know why|what you don['’]t understand|what you do not understand|what you need to understand|what you fail to understand|let me tell you|let me explain|listen to me|listen closely|you know what|there['’]s something you should know|there is something you should know|but here['’]s the thing|if you want to know|one thing you should know|what i mean is|you see|see,\s*here['’]s|see,\s*the thing|see,\s*you|listen,\s*here['’]s|listen,\s*the thing)\b/i;
 
 
   /*
    * ============================================================
-   * FULL CORE RULES
+   * CORE RULES
    * ============================================================
    */
 
@@ -67,41 +72,8 @@ OUTCOMES
 - Player wording never forces success, quantity, speed, damage, injury, death, or any other outcome.
 - Claims such as "I dodge," "I hit him 1000 times," "I speed blitz him," or "I kill him" describe attempts. Resolve what actually happens.
 - Declared quantities and combo lengths are attempts.
-- Resolve outcomes from established capability and circumstance rather than protagonist status or dramatic convenience.
+- Resolve outcomes from established capability and circumstance, not protagonist status or dramatic convenience.
 - Trivial, safe, uncontested actions should not randomly fail.
-
-Consider:
-- Strength.
-- Speed.
-- Reaction speed.
-- Agility.
-- Durability.
-- Intelligence.
-- Skill.
-- Training.
-- Experience.
-- Equipment.
-- Weapons.
-- Powers.
-- Techniques.
-- Transformations.
-- Injuries.
-- Fatigue.
-- Remaining energy.
-- Opposition.
-- Number of opponents.
-- Positioning.
-- Terrain.
-- Surprise.
-- Timing.
-
-Possible outcomes include:
-- Full success.
-- Partial success.
-- Success with cost.
-- Stalemate.
-- Failure.
-- Severe failure when strongly justified.
 
 
 POWER & CAPABILITY SOURCES
@@ -109,7 +81,7 @@ POWER & CAPABILITY SOURCES
 PLAYER
 - Treat Plot Essentials as the primary baseline source for the player's established capabilities.
 
-Use Plot Essentials for:
+Use Plot Essentials for established:
 - Strength.
 - Speed.
 - Reaction speed.
@@ -131,7 +103,7 @@ Use Plot Essentials for:
 
 
 ENEMIES, ALLIES, AND NPCS
-- Treat relevant Story Cards as the primary baseline source for enemies, allies, and NPCs when available.
+- Treat relevant Story Cards as the primary baseline source for enemies, allies, and other NPCs when available.
 
 Story Cards may establish:
 - Strength.
@@ -151,7 +123,7 @@ Story Cards may establish:
 - Special conditions.
 - Limitations.
 
-- Evaluate separately described combatants individually.
+- If several combatants have individual Story Cards, evaluate them individually.
 - Do not treat everyone in a group as having identical capabilities.
 - Never automatically scale enemies to match the player.
 - Never automatically scale the player to match enemies.
@@ -160,7 +132,7 @@ Story Cards may establish:
 
 CURRENT CONDITION OVERRIDES BASELINE
 - Plot Essentials and Story Cards describe baseline capability.
-- Recent established events describe CURRENT condition.
+- Recent established story events describe CURRENT condition.
 
 Current condition includes:
 - Injuries.
@@ -179,26 +151,31 @@ Current condition includes:
 - Recent consequences.
 
 - Current condition modifies baseline capability.
-- A normally fast fighter with badly injured legs does not operate at full healthy speed.
-- A powerful fighter who is exhausted and nearly out of energy performs according to that weakened current state.
+- A normally fast fighter with badly injured legs should not operate at full healthy speed.
+- A normally powerful fighter who is exhausted and nearly out of energy performs according to that weakened current condition.
 
 
 SOURCE PRIORITY
+
+When determining capability, use:
+
 1. Current established condition and recent consequences.
-2. Explicit Plot Essentials and relevant Story Cards.
+2. Explicit information in Plot Essentials and relevant Story Cards.
 3. Other clearly established story information.
 4. Conservative reasonable inference only when necessary.
 
 - Never override explicit information with an invented power level.
-- Missing information does not automatically make someone weak or overwhelmingly strong.
-- Missing information does not grant immunity or create vulnerability.
+- Missing information does not automatically make someone weak.
+- Missing information does not automatically make someone overwhelmingly strong.
+- Missing information does not grant immunity.
+- Missing information does not create vulnerability.
 - Do not invent abilities simply because they would help someone win or survive.
 
 
 SPEED BLITZING
 - Any sufficiently faster combatant may attempt to speed blitz another character.
-- A real speed blitz requires a large enough speed and reaction gap that the slower character cannot reliably track or react before the action occurs.
-- Declaring a speed blitz does not automatically make it succeed.
+- A true speed blitz requires a large enough speed and reaction gap that the slower character cannot reliably track or react before the action occurs.
+- Declaring a speed blitz does not make it automatically succeed.
 
 Consider:
 - Raw speed.
@@ -215,7 +192,16 @@ Consider:
 
 CONSISTENCY
 - Never grant feats beyond established capability merely because they are declared.
-- Preserve established power, abilities, injuries, fatigue, energy expenditure, equipment state, positioning, and consequences.
+- Preserve established power.
+- Preserve established abilities.
+- Preserve injuries.
+- Preserve fatigue.
+- Preserve energy expenditure.
+- Preserve equipment damage.
+- Preserve lost equipment.
+- Preserve positioning.
+- Preserve consequences.
+
 - Fatigue persists until credible recovery.
 - High-output actions consume appropriate stamina or setting-specific energy unless explicitly established otherwise.
 - Injuries persist until credibly treated or healed.
@@ -260,7 +246,8 @@ Anyone may:
 - Die.
 
 - Narrative importance does not protect anyone.
-- Unfinished plans or future usefulness do not protect anyone.
+- Unfinished story plans do not protect anyone.
+- Future usefulness does not protect anyone.
 
 Do not invent convenient:
 - Misses.
@@ -275,8 +262,8 @@ Do not invent convenient:
 solely to preserve an important character.
 
 - Do not force injury or death merely for drama either.
-- Survival and death must follow established cause and effect.
-- If consequences change the intended storyline, continue from the new reality rather than undoing them.
+- Survival and death must both follow established cause and effect.
+- If a major consequence changes the intended storyline, continue from the new reality rather than undoing it.
 
 
 NUMBERS & OPPOSITION
@@ -289,7 +276,7 @@ NUMBERS & OPPOSITION
 - Reduced recovery time matters.
 - Greater fatigue matters.
 - Several weaker opponents may overwhelm a stronger individual through numbers and teamwork.
-- Do not weaken groups because the player is the protagonist.
+- Do not weaken groups simply because the player is the protagonist.
 
 
 NON-COMBAT
@@ -316,7 +303,7 @@ Examples:
 
   /*
    * ============================================================
-   * FULL COMBAT RULES
+   * COMBAT RULES
    * ============================================================
    */
 
@@ -341,8 +328,8 @@ Then account for:
 - Numbers.
 - Temporary effects.
 
-- A much faster character should possess a meaningful speed advantage and may speed blitz if the gap is sufficient.
-- A much stronger character should possess a meaningful power advantage.
+- A much faster character should normally possess a meaningful speed advantage and may be capable of a speed blitz if the gap is sufficient.
+- A much stronger character should normally possess a meaningful power advantage.
 - A more durable character should withstand proportionally more punishment.
 - A more skilled or experienced fighter should make better tactical decisions.
 - Advantages do not guarantee victory.
@@ -384,7 +371,7 @@ Initiative and reactions depend on:
 - Energy.
 - Circumstances.
 
-- None automatically succeed.
+- None of these actions automatically succeed.
 
 
 TACTICS
@@ -444,47 +431,55 @@ Numerical advantage must materially affect:
 
 
 PLAYER-CENTERED GROUP BATTLE FOCUS
-When combat contains multiple allies and enemies, including 2v2, 3v2, 3v3, 4v4, or larger battles, the PLAYER'S immediate fight remains the primary foreground focus.
+When combat contains multiple allies and enemies, such as:
+- 2v2.
+- 3v2.
+- 3v3.
+- 4v4.
+- Larger battles.
 
-Primarily follow:
+the PLAYER'S immediate fight remains the primary foreground focus.
+
+The narration should primarily follow:
 - The player's opponent.
 - The player's attacks.
 - The player's defenses.
 - Threats directly affecting the player.
-- Major events altering the player's situation.
+- Major events that alter the player's situation.
 
-- Do not constantly cut away to narrate every other fight in equal detail.
+- Do not constantly cut away from the player to narrate every other fight in equal detail.
 - Other combatants continue fighting in the background.
-- They do not freeze, disappear, or wait because narration is focused on the player.
+- They do not freeze, disappear, or wait simply because narration is focused on the player.
 - Background fights continue progressing logically.
 
-Briefly acknowledge meaningful developments such as:
-- A serious injury.
+Briefly acknowledge important developments when relevant:
+- An ally taking a serious injury.
 - An enemy being defeated.
-- A major technique.
+- A major technique being used.
 - Someone being knocked away.
-- Someone becoming free to assist.
-- A nearby fight entering the player's area.
+- Someone becoming free to assist another fighter.
+- A background fight moving into the player's immediate area.
 - A battlefield-wide attack.
 
 
 AUTOMATIC OPPONENT ASSIGNMENT
-- When group combat begins, combatants naturally identify available opposing combatants.
-- If practical, each fighter initially engages an opponent not already fully occupied.
+- When group combat begins, combatants should naturally identify available opposing combatants.
+- If practical, each fighter should initially engage an opponent who is not already fully occupied.
 
-Example 3v3:
+Example in a 3v3:
+
 Ally A engages Enemy A.
 Ally B engages Enemy B.
 The player engages Enemy C.
 
 - Do not make every enemy attack the player by default when other valid opposing combatants are present.
-- Allies should not all attack one enemy while ignoring other active enemies without a tactical reason.
+- Likewise, allies should not all attack one enemy while ignoring other active enemies unless there is a tactical reason.
 
-Characters naturally seek:
+Characters should naturally seek:
 - The closest suitable opponent.
 - The greatest immediate threat.
-- Someone attacking them.
-- Someone attacking an ally they want to protect.
+- An opponent attacking them.
+- An opponent attacking an ally they want to protect.
 - A tactically favorable matchup.
 - An unoccupied opponent.
 
@@ -493,23 +488,23 @@ Characters naturally seek:
 
 
 UNEVEN GROUPS
-If one side has more fighters, surplus combatants may:
-- Double-team.
+If one side has more fighters than the other, surplus combatants may:
+- Double-team an opponent.
 - Flank.
 - Provide ranged support.
-- Protect allies.
+- Protect an ally.
 - Intercept attacks.
-- Prepare traps.
-- Attack blind spots.
+- Prepare a trap.
+- Attack from a blind spot.
 - Control terrain.
 - Prevent escape.
-- Assist struggling teammates.
+- Assist a struggling teammate.
 
-- Do not force artificial one-on-one duels when numbers or tactics make cooperation more realistic.
+- Do not force every fight into artificial one-on-one duels when numbers or tactics make that unrealistic.
 
 
 FIGHTER FREED FROM A MATCHUP
-- When an NPC defeats, incapacitates, drives away, or otherwise finishes with their current opponent, they become tactically free.
+- When an NPC combatant defeats, incapacitates, drives away, or otherwise finishes with their current opponent, they become tactically free.
 
 A free ALLY may:
 - Help the player.
@@ -524,24 +519,25 @@ A free ENEMY may:
 - Attack the player.
 - Help another enemy.
 - Double-team an ally.
-- Flank.
-- Intercept.
+- Flank someone.
+- Intercept someone.
 - Pursue a wounded opponent.
 - Protect another enemy.
 
-- This logic applies continuously.
-- Matchups may naturally change as fighters are defeated or freed.
+- The same logic applies continuously throughout battle.
+- If an ally finishes their opponent before the player, they may enter the player's fight and assist.
+- If an enemy finishes an ally before the player finishes their own opponent, that enemy may become free and join another fight.
 
 
 PLAYER AFTER DEFEATING THEIR OPPONENT
-- If the player defeats their current opponent, recognize that the player is now free.
-- Do not automatically force the player's next voluntary attack unless their intent already establishes it.
+- If the player defeats their current opponent, recognize that they are now tactically free.
+- Do not automatically force the player's next voluntary attack unless the player's intent already establishes it.
 
-Present the situation so the player may choose to:
+Present the battlefield so the player may choose to:
 - Help an ally.
 - Attack another enemy.
 - Protect someone.
-- Pursue.
+- Pursue someone.
 - Retreat.
 - Reposition.
 - Take another action.
@@ -550,24 +546,32 @@ Present the situation so the player may choose to:
 
 
 BACKGROUND BATTLE CONTINUITY
-- Other fights continue while the player's fight is narrated.
+- Other fights continue while the player's fight is being narrated.
 - Track background combat conceptually.
 - Do not repeatedly provide long unrelated cutaways.
 
-Reveal important background progress through:
+Reveal background progress naturally through:
 - Sounds.
 - Glimpses.
-- Impacts.
+- Nearby impacts.
 - Dialogue.
 - Characters crossing into view.
-- Defeated fighters falling nearby.
-- Explosions.
-- Calls for help.
-- A fighter suddenly joining the player's battle.
+- A defeated fighter falling nearby.
+- A major explosion.
+- An ally calling for help.
+- An enemy suddenly joining the player's fight.
+
+- Background combat should feel alive without stealing primary narrative focus.
 
 
 DESPERATION
-A combatant who reasonably believes death, capture, incapacitation, or decisive defeat is imminent may escalate immediately.
+A combatant who reasonably believes:
+- Death.
+- Capture.
+- Incapacitation.
+- Decisive defeat.
+
+is imminent may escalate immediately.
 
 They may use:
 - Their strongest established attacks.
@@ -579,7 +583,7 @@ They may use:
 - Large amounts of remaining energy.
 
 - They do not have to irrationally save powerful abilities while facing death.
-- Personality still affects how they react.
+- Personality still influences how they react.
 
 
 CONTINUOUS COMBAT
@@ -604,15 +608,16 @@ into fluid exchanges.
 - A counter does not automatically end a combination.
 - Counters may themselves be countered, interrupted, or anticipated.
 - Maintain fast anime-style pressure without making combat endless.
-- Advance meaningfully and stop at a natural decision point or meaningful change in advantage.
+- Advance the situation meaningfully.
+- Stop at a natural decision point or meaningful change in advantage.
 
 
 DIALOGUE & COMBAT CONTINUITY
 - Combat is not an excuse to ignore dialogue.
 - Dialogue is part of scene progression.
-- Forward progression does not mean someone must immediately attack.
+- Forward progression does NOT mean someone must immediately attack.
 
-A response may move forward through:
+A response may move the scene forward through:
 - Dialogue.
 - Revelation.
 - Argument.
@@ -639,28 +644,38 @@ Combatants may:
 - Reveal information.
 - Comment on techniques.
 
+Dialogue may occur during:
+- Attacks.
+- Clashes.
+- Movement.
+- Defense.
+- Preparation.
+- Repositioning.
+- Temporary pauses.
+
 - Talking does not freeze combat.
 - Combat does not automatically cancel talking.
-- A character may continue speaking while moving, defending, preparing, attacking, or repositioning.
-- If a character begins an explanation, threat, boast, joke, argument, question, or conversational setup, preserve the logical continuation of the thought.
+- A character may continue speaking while moving, defending, preparing an attack, attacking, or repositioning.
+- If a character begins an explanation, threat, boast, joke, argument, question, or conversational setup, preserve the logical continuation of that thought.
 - Do not abruptly replace a clearly leading statement with an unrelated attack.
-- A conversational thought may be interrupted when an immediate event genuinely justifies it.
-- When the player directly addresses a combatant, allow a natural in-character response when circumstances permit.
+- If the previous response ends with a setup such as "here's the thing," "the reason is," "the truth is," "let me tell you," "you know why," "what you don't understand," or similar wording, normally continue or complete the thought.
+- A conversational thought may be interrupted when an actual immediate event justifies interruption.
+- When the player taunts, questions, threatens, insults, jokes with, or directly addresses a combatant, allow that character to respond according to personality when appropriate.
 
 Narrative priority when events compete:
-1. Immediate lethal danger requiring urgent reaction.
+1. Immediate lethal danger requiring an urgent reaction.
 2. Necessary defense or interruption.
-3. Pending conversational thought.
-4. Natural response to dialogue.
+3. A pending conversational thought.
+4. A natural response to dialogue directed at the character.
 5. Tactical movement, preparation, or observation.
-6. New offensive action.
+6. A new offensive action.
 
-- This is not rigid turn order.
+- This priority is NOT a rigid turn order.
 
 
 MORTALITY
 - Damage accumulates.
-- Severe injuries, blood loss, organ damage, exhaustion, and repeated bodily trauma may eventually incapacitate or kill someone.
+- Repeated severe injuries, blood loss, organ damage, exhaustion, and bodily trauma may eventually incapacitate or kill a character.
 - A successfully delivered lethal attack should be lethal when it overcomes established defenses and durability.
 
 Do not guarantee:
@@ -688,22 +703,22 @@ Do not guarantee:
 
 - Treat everything already narrated as established history.
 - Continue strictly from the newest established event.
-- Do not restart, replay, recap, or re-narrate previous events.
-- Do not merely paraphrase the player's newest action.
+- Do not restart the previous exchange.
+- Do not replay the previous exchange.
+- Do not re-narrate the previous exchange.
+- Do not merely paraphrase the player's latest action.
 - Do not merely paraphrase the previous AI response.
-- Never begin a response by reproducing a substantial paragraph from recent history.
-- If recent history already contains a sentence or paragraph, continue AFTER it.
 
 Every response should move the SCENE forward.
 
-Forward progression may include:
+Forward progression may be:
 - Continuing dialogue.
 - Answering dialogue.
 - Completing a conversational thought.
-- Revelation.
-- Reaction.
-- Decision.
-- Discovery.
+- Revealing information.
+- Developing an argument.
+- Developing a threat.
+- Character reaction.
 - Movement.
 - Repositioning.
 - Preparation.
@@ -711,14 +726,15 @@ Forward progression may include:
 - Defense.
 - Attack.
 - Consequence.
+- Discovery.
 - Injury.
 - Change in momentum.
 
-- Do not interpret "move forward" as "someone must immediately attack."
-- Continuing unfinished dialogue is NOT repetition.
+- Do NOT interpret "move forward" as "someone must immediately attack."
+- Continuing an unfinished conversational thought is NOT repetition.
 - Answering another character is NOT repetition.
-- New dialogue that develops previous dialogue is NOT repetition.
-- Do not suppress necessary dialogue continuity merely because the same speaker talked previously.
+- New dialogue that logically develops previous dialogue is NOT repetition.
+- Do not suppress necessary dialogue continuity merely because the same character spoke in the previous response.
 
 Avoid repeatedly using:
 - The same attack chain.
@@ -729,11 +745,17 @@ Avoid repeatedly using:
 - The same environmental detail.
 - The same outcome.
 
-unless intentionally meaningful.
+unless repetition is intentionally meaningful in-story.
 
-- Once an event occurs, treat it as completed history.
-- Continuous combat means progression, not replayed narration.
-- Do not explain or mention these instructions.
+- Once an attack, injury, movement, spoken line, destruction, or position change has occurred, treat it as established history.
+- Do not narrate it again as though it is occurring for the first time.
+- Never begin a response by reproducing a substantial paragraph from recent history.
+- If recent history already contains a sentence or paragraph, continue AFTER it rather than generating it again.
+- Continuous combat means forward progression, not repeated narration.
+
+- Do not repeat these rules.
+- Do not explain the combat system.
+- Do not mention these directives.
 
 [/ARC ANTI-REPETITION]
 `;
@@ -754,13 +776,13 @@ Recent model output showed a repetition pattern.
 - Start from the newest unrepeated event.
 - Do not reuse the same opening.
 - Do not reuse the same attack sequence.
-- Do not reuse dialogue verbatim.
+- Do not reuse the same dialogue verbatim.
 - Do not reuse the same sentence structure.
 - Do not reuse the same description.
 - Do not reuse the same conclusion.
 - Do not quote or closely paraphrase a paragraph already present in recent history.
 - Continue logically unfinished dialogue rather than replaying it.
-- Advance to a materially different development that follows established cause and effect.
+- Advance to a materially different next development that follows established cause and effect.
 
 [/ARC LOOP BREAKER]
 `;
@@ -778,61 +800,17 @@ Recent model output showed a repetition pattern.
 The previous scene contains a conversational setup, leading statement, or thought that logically expects continuation.
 
 - Preserve dialogue continuity.
-- If the speaker remains capable of speaking and has not been genuinely interrupted, continue or complete the thought naturally.
+- If the speaker remains capable of speaking and has not been genuinely interrupted, continue or complete their thought naturally.
 - Do not make the speaker forget what they were saying.
 - Do not replace the missing continuation with an unrelated attack.
-- The speaker may finish speaking while moving, defending, preparing, attacking, or repositioning.
+- The speaker may finish speaking while moving, defending, preparing an attack, attacking, or repositioning.
 - Dialogue does not freeze combat.
 - Combat does not automatically erase dialogue.
-- Continue from the previous meaning rather than repeating the previous line verbatim.
-- If immediate danger genuinely interrupts the speaker, make that interruption clear.
+- Do not repeat the previous line verbatim merely to continue it.
+- Continue from the meaning of that line.
+- If immediate danger genuinely interrupts the speaker, make the interruption clear.
 
 [/ARC DIALOGUE CONTINUITY]
-`;
-
-
-  /*
-   * ============================================================
-   * OPTIMIZED CONTEXT FALLBACK RULES
-   * ============================================================
-   *
-   * Used only if there isn't enough free room to append the
-   * full rules while Optimized Context is enabled.
-   */
-
-  const OPTIMIZED_COMPACT_RULES = `
-[ARC COMPACT RULES]
-
-- Treat meaningful uncertain player actions as attempts, never guaranteed results.
-- Player wording cannot force hits, dodges, quantities, speed blitzes, damage, death, victory, or survival.
-- Resolve capability from current condition first, then Plot Essentials for the player, relevant Story Cards for NPCs/enemies/allies, other established facts, then conservative inference.
-- Preserve genuine differences in strength, speed, reactions, durability, skill, abilities, equipment, weaknesses, injuries, fatigue, and remaining energy.
-- Never automatically scale combatants to one another.
-- Any sufficiently faster fighter may speed blitz if the actual speed/reaction gap supports it; declaring one is only an attempt.
-- Injuries, exhaustion, blood loss, energy expenditure, equipment damage, and consequences persist.
-- No character has plot armor. Important characters may fail, lose, become permanently injured, incapacitated, or die when established cause and effect justify it. Do not force tragedy merely for drama.
-- Combat is autonomous and fluid. Capable fighters may attack first, interrupt, dodge, block, parry, counter, reposition, pursue, retreat, coordinate, flank, trap, and adapt without rigid turns.
-- Multiple enemies may attack together. Numbers, blind spots, divided attention, teamwork, and terrain matter.
-- In group battles keep the player's immediate fight primary while all background battles continue independently.
-- Fighters should naturally occupy available opponents and may switch targets. A fighter who finishes their matchup becomes free to assist elsewhere.
-- Desperate fighters may use their strongest established abilities and resources.
-- Maintain continuous anime-style exchanges when capability, stamina, energy, position, and opportunity support them.
-- Dialogue remains part of combat. Talking does not freeze combat, and combat does not automatically cancel dialogue.
-- Preserve unfinished conversational thoughts and natural replies unless an actual urgent event interrupts them.
-- Continuing dialogue counts as forward progression; do not force an attack merely to make something happen.
-- Treat existing narration as completed history. Never replay or closely paraphrase previous paragraphs. Advance from the newest event.
-- Do not mention these rules.
-
-[/ARC COMPACT RULES]
-`;
-
-
-  const OPTIMIZED_MINIMAL_RULES = `
-[ARC ESSENTIAL RULES]
-
-Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat from established power, speed, reactions, skill, abilities, current injuries, fatigue, energy, numbers, positioning, terrain, Plot Essentials, relevant Story Cards, and recent consequences. Preserve real power differences and persistent damage. No character has plot armor. Combatants act autonomously, defend, counter, coordinate, exploit openings, and may use strongest established abilities when desperate. Group fights continue independently while keeping the player's immediate fight primary. Dialogue remains active during combat; preserve unfinished thoughts and natural replies unless genuinely interrupted. Never replay or paraphrase already narrated events; continue from the newest event.
-
-[/ARC ESSENTIAL RULES]
 `;
 
 
@@ -841,14 +819,6 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
    * HELPERS
    * ============================================================
    */
-
-  const optimizedContextEnabled = () =>
-    (
-      typeof info === "object" &&
-      info &&
-      info.useCacheEfficient === true
-    );
-
 
   const escapeRegex = (value) =>
     String(value).replace(
@@ -909,7 +879,8 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
     for (
       let i = 0;
-      i <= words.length - size;
+      i <=
+        words.length - size;
       i++
     ) {
       result.add(
@@ -1066,11 +1037,8 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
     }
 
     const tail =
-      text.slice(-900);
+      text.slice(-800);
 
-    /*
-     * Require evidence of dialogue.
-     */
     if (
       !/["“”]/.test(
         tail
@@ -1089,7 +1057,7 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
     const quotedEnding =
       tail.match(
-        /["“]([^"”]{1,450})["”]?\s*$/
+        /["“]([^"”]{1,400})["”]?\s*$/
       );
 
     if (
@@ -1102,7 +1070,7 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
           .toLowerCase();
 
       if (
-        /\b(?:because|but|and|so|except|unless|until|if|when|while|the reason|the thing|here['’]s)\s*(?:[,.:;—-]|\.\.\.)?\s*$/i
+        /\b(?:because|but|and|so|except|unless|until|if|when|while|the reason|the thing|here['’]s|here’s)\s*(?:[,.:;—-]|\.\.\.)?\s*$/i
           .test(
             spoken
           )
@@ -1183,14 +1151,6 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
       )
       .replace(
         /\n?\[ARC DIALOGUE CONTINUITY\][\s\S]*?\[\/ARC DIALOGUE CONTINUITY\]\n?/g,
-        "\n"
-      )
-      .replace(
-        /\n?\[ARC COMPACT RULES\][\s\S]*?\[\/ARC COMPACT RULES\]\n?/g,
-        "\n"
-      )
-      .replace(
-        /\n?\[ARC ESSENTIAL RULES\][\s\S]*?\[\/ARC ESSENTIAL RULES\]\n?/g,
         "\n"
       );
 
@@ -1383,11 +1343,8 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
   /*
    * ============================================================
-   * NORMAL CONTEXT HISTORY DE-DUPLICATION
+   * CONTEXT HISTORY DE-DUPLICATION
    * ============================================================
-   *
-   * Disabled in Optimized Context mode because optimized mode
-   * preserves the host-provided prefix instead of rewriting it.
    */
 
   const dedupeContextHistory = (
@@ -1405,7 +1362,8 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
       [];
 
     for (
-      const paragraph of paragraphs
+      const paragraph of
+      paragraphs
     ) {
       const norm =
         normalize(
@@ -1467,7 +1425,8 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
   const prepareState = () => {
     const action =
-      info.actionCount || 0;
+      info.actionCount ||
+      0;
 
     if (
       typeof state.arcLastActionCount ===
@@ -1478,12 +1437,10 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
       delete state.arcCombatUntil;
       delete state.arcCombatCards;
       delete state.arcTurnDirective;
-      delete state.arcTurnDirectiveAction;
       delete state.arcPreviousPlayerInput;
       delete state.arcLoopBreakTurns;
       delete state.arcForceLoopBreak;
       delete state.arcDialogueContinuityPending;
-      delete state.arcOptimizedContext;
     }
 
     state.arcLastActionCount =
@@ -1493,15 +1450,6 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
       state.arcCombatCards ||
       {};
 
-    /*
-     * Record the actual mode AI Dungeon reports.
-     */
-    state.arcOptimizedContext =
-      optimizedContextEnabled();
-
-    /*
-     * Output can request stronger loop handling.
-     */
     if (
       state.arcForceLoopBreak
     ) {
@@ -1522,13 +1470,13 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
   const combatActive = (
     action =
-      info.actionCount || 0
+      info.actionCount ||
+      0
   ) =>
-    (
-      typeof state.arcCombatUntil ===
-        "number" &&
-      state.arcCombatUntil >= action
-    );
+    typeof state.arcCombatUntil ===
+      "number" &&
+    state.arcCombatUntil >=
+      action;
 
 
   /*
@@ -1542,9 +1490,10 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
     wasRepeated,
     activeCombat
   ) => {
-    const parts = [
-      "Resolve the newest player input exactly once. Treat declared outcomes, quantities, finishing claims, and speed blitz claims as attempts. Do not simply echo or paraphrase the player's wording; begin with a new reaction, consequence, continuation, or development."
-    ];
+    const parts =
+      [
+        "Resolve the newest player input exactly once. Treat declared outcomes, quantities, finishing claims, and speed blitz claims as attempts. Do not simply echo or paraphrase the player's wording; begin with a new reaction, consequence, continuation, or development."
+      ];
 
     if (
       looksLikePlayerDialogue(
@@ -1552,7 +1501,7 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
       )
     ) {
       parts.push(
-        "The player directly addressed someone. If that character is present, conscious, capable of responding, and not forced into an immediate emergency reaction, allow a natural in-character reply instead of skipping straight to an unrelated attack. They may respond while moving, defending, preparing, or attacking."
+        "The player directly spoke to or addressed someone. If that character is present, conscious, capable of responding, and not forced into an immediate emergency reaction, allow a natural in-character response instead of skipping straight to an unrelated attack. The response may happen while the character moves, defends, prepares, or attacks."
       );
     }
 
@@ -1568,7 +1517,7 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
       activeCombat
     ) {
       parts.push(
-        "Combat remains active and autonomous. Other capable combatants may react, interrupt, defend, counter, reposition, speak, or continue their own fights. Do not assume forward progress requires an immediate attack."
+        "Combat remains active and autonomous. Other capable combatants may react, interrupt, defend, counter, reposition, speak, or continue their own fights while this attempt is resolved. Do not assume forward progress requires an immediate attack."
       );
     }
 
@@ -1579,7 +1528,7 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
         )
     ) {
       parts.push(
-        "Any declared large quantity is aspirational rather than guaranteed. Only narrate the amount physically achieved before defense, interruption, exhaustion, or changing circumstances stop it."
+        "Any declared large quantity or repetition count is aspirational, not guaranteed. Only narrate the amount physically achieved before interruption, exhaustion, defense, or changing circumstances stop it."
       );
     }
 
@@ -1613,7 +1562,8 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
         : [];
 
     const action =
-      info.actionCount || 0;
+      info.actionCount ||
+      0;
 
     if (
       !active ||
@@ -1750,20 +1700,17 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
   /*
    * ============================================================
-   * STORY CARD BACKUP BLOCK
+   * STORY CARD BACKUP
    * ============================================================
    */
 
   const buildRelevantCardsBlock = (
     cards,
-    contextText,
-    active,
-    budget =
-      CONFIG.MAX_CARD_CONTEXT_CHARS
+    cleanedText,
+    active
   ) => {
     if (
-      !active ||
-      budget <= 0
+      !active
     ) {
       return "";
     }
@@ -1789,19 +1736,7 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
     }
 
     let remaining =
-      Math.min(
-        CONFIG.MAX_CARD_CONTEXT_CHARS,
-        budget
-      );
-
-    /*
-     * Leave room for wrapper text.
-     */
-    remaining =
-      Math.max(
-        0,
-        remaining - 650
-      );
+      CONFIG.MAX_CARD_CONTEXT_CHARS;
 
     const pieces =
       [];
@@ -1819,13 +1754,10 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
         break;
       }
 
-      /*
-       * AI Dungeon already supplied this card naturally.
-       */
       if (
         cardAlreadyInContext(
           card,
-          contextText
+          cleanedText
         )
       ) {
         continue;
@@ -1895,9 +1827,20 @@ Treat uncertain actions as attempts, not guaranteed outcomes. Resolve combat fro
 
 These Story Card facts are relevant to characters or entities currently involved in combat.
 
-Use them as established baseline information when determining power, speed, durability, skill, abilities, equipment, techniques, weaknesses, resistances, energy, and limitations.
+Use them as established baseline information when determining:
+- Power.
+- Speed.
+- Durability.
+- Skill.
+- Abilities.
+- Equipment.
+- Techniques.
+- Weaknesses.
+- Resistances.
+- Energy.
+- Limitations.
 
-Recent injuries, fatigue, energy use, equipment changes, transformations, positioning, and other current conditions override baseline values when applicable.
+Recent injuries, fatigue, energy use, equipment changes, transformations, positioning, and other current conditions still override baseline values when applicable.
 
 ${pieces.join("\n")}
 
@@ -1970,7 +1913,8 @@ ${pieces.join("\n")}
 
     const input =
       String(
-        text || ""
+        text ||
+          ""
       );
 
     if (
@@ -1996,10 +1940,6 @@ ${pieces.join("\n")}
         action
       )
     ) {
-      /*
-       * Dialogue and non-attack actions during a fight should not
-       * immediately make combat disappear.
-       */
       state.arcCombatUntil =
         Math.max(
           state.arcCombatUntil,
@@ -2019,8 +1959,10 @@ ${pieces.join("\n")}
       );
 
     const wasRepeated =
-      currentNorm.length >= 20 &&
-      currentNorm === previousNorm;
+      currentNorm.length >=
+        20 &&
+      currentNorm ===
+        previousNorm;
 
     state.arcTurnDirective =
       buildTurnDirective(
@@ -2030,9 +1972,6 @@ ${pieces.join("\n")}
           action
         )
       );
-
-    state.arcTurnDirectiveAction =
-      action;
 
     state.arcPreviousPlayerInput =
       input;
@@ -2056,379 +1995,6 @@ ${pieces.join("\n")}
 
   /*
    * ============================================================
-   * NORMAL CONTEXT BUILDER
-   * ============================================================
-   */
-
-  const buildNormalContext = (
-    incomingText,
-    directives,
-    turnDirective
-  ) => {
-    const cleanedText =
-      stripArcBlocks(
-        incomingText
-      );
-
-    const memoryLength =
-      Math.min(
-        info.memoryLength ||
-          0,
-        cleanedText.length
-      );
-
-    const memoryPart =
-      memoryLength
-        ? cleanedText.slice(
-            0,
-            memoryLength
-          )
-        : "";
-
-    let storyPart =
-      memoryLength
-        ? cleanedText.slice(
-            memoryLength
-          )
-        : cleanedText;
-
-    storyPart =
-      dedupeContextHistory(
-        storyPart
-      );
-
-    const maxChars =
-      info.maxChars ||
-      (
-        memoryPart.length +
-        directives.length +
-        storyPart.length +
-        turnDirective.length +
-        1000
-      );
-
-    const availableStoryChars =
-      Math.max(
-        0,
-        maxChars -
-          memoryPart.length -
-          directives.length -
-          turnDirective.length -
-          4
-      );
-
-    storyPart =
-      availableStoryChars > 0
-        ? storyPart.slice(
-            -availableStoryChars
-          )
-        : "";
-
-    return [
-      memoryPart,
-      directives,
-      storyPart,
-      turnDirective
-    ]
-      .filter(Boolean)
-      .join("\n");
-  };
-
-
-  /*
-   * ============================================================
-   * OPTIMIZED CONTEXT BUILDER
-   * ============================================================
-   *
-   * IMPORTANT:
-   *
-   * In Optimized Context mode ARC avoids rebuilding or
-   * de-duplicating AI Dungeon's existing prompt.
-   *
-   * Instead, it keeps the incoming text intact and appends ARC's
-   * instructions into whatever free room is available.
-   */
-
-  const buildOptimizedContext = (
-    incomingText,
-    fullRules,
-    active,
-    cards,
-    dialoguePending,
-    loopRisk,
-    turnDirective
-  ) => {
-    const original =
-      String(
-        incomingText || ""
-      );
-
-    const maxChars =
-      (
-        typeof info.maxChars ===
-          "number" &&
-        info.maxChars > 0
-      )
-        ? info.maxChars
-        : (
-            original.length +
-            fullRules.length +
-            CONFIG.MAX_CARD_CONTEXT_CHARS +
-            2000
-          );
-
-    let room =
-      Math.max(
-        0,
-        maxChars -
-          original.length -
-          CONFIG.OPTIMIZED_CONTEXT_MARGIN
-      );
-
-    if (
-      room <= 0
-    ) {
-      /*
-       * Preserve the host context rather than destroying its
-       * cache-efficient prefix just to force extra text in.
-       */
-      return original;
-    }
-
-
-    /*
-     * ----------------------------------------------------------
-     * DYNAMIC HIGH-PRIORITY BLOCKS
-     * ----------------------------------------------------------
-     */
-
-    const dynamicCandidates =
-      [];
-
-    /*
-     * Turn directive is especially important because it describes
-     * exactly how to resolve the newest player input.
-     */
-    if (
-      turnDirective
-    ) {
-      dynamicCandidates.push(
-        turnDirective
-      );
-    }
-
-    if (
-      dialoguePending
-    ) {
-      dynamicCandidates.push(
-        DIALOGUE_CONTINUITY
-      );
-    }
-
-    if (
-      loopRisk
-    ) {
-      dynamicCandidates.push(
-        LOOP_BREAKER
-      );
-    }
-
-    const chosenDynamic =
-      [];
-
-    /*
-     * Save room for at least a minimal permanent ruleset.
-     */
-    let dynamicBudget =
-      Math.max(
-        0,
-        room -
-          OPTIMIZED_MINIMAL_RULES.length -
-          4
-      );
-
-    for (
-      const block of dynamicCandidates
-    ) {
-      if (
-        block.length <=
-          dynamicBudget
-      ) {
-        chosenDynamic.push(
-          block
-        );
-
-        dynamicBudget -=
-          block.length + 1;
-      }
-    }
-
-    const dynamicText =
-      chosenDynamic.join(
-        "\n"
-      );
-
-    let remainingAfterDynamic =
-      Math.max(
-        0,
-        room -
-          dynamicText.length -
-          (
-            dynamicText
-              ? 2
-              : 0
-          )
-      );
-
-
-    /*
-     * ----------------------------------------------------------
-     * CHOOSE FULL / COMPACT / MINIMAL RULE SET
-     * ----------------------------------------------------------
-     */
-
-    let ruleBlock =
-      "";
-
-    if (
-      fullRules.length <=
-        remainingAfterDynamic
-    ) {
-      ruleBlock =
-        fullRules;
-    } else if (
-      OPTIMIZED_COMPACT_RULES.length <=
-        remainingAfterDynamic
-    ) {
-      ruleBlock =
-        OPTIMIZED_COMPACT_RULES;
-    } else if (
-      OPTIMIZED_MINIMAL_RULES.length <=
-        remainingAfterDynamic
-    ) {
-      ruleBlock =
-        OPTIMIZED_MINIMAL_RULES;
-    }
-
-
-    remainingAfterDynamic =
-      Math.max(
-        0,
-        remainingAfterDynamic -
-          ruleBlock.length -
-          (
-            ruleBlock
-              ? 2
-              : 0
-          )
-      );
-
-
-    /*
-     * ----------------------------------------------------------
-     * STORY CARD BACKUP
-     * ----------------------------------------------------------
-     *
-     * The 10K setting remains the maximum, but Optimized Context
-     * automatically uses less when less free room exists.
-     */
-
-    const cardsBlock =
-      buildRelevantCardsBlock(
-        cards,
-        original,
-        active,
-        Math.min(
-          CONFIG.MAX_CARD_CONTEXT_CHARS,
-          remainingAfterDynamic
-        )
-      );
-
-
-    const additions =
-      [
-        ruleBlock,
-        cardsBlock,
-        dynamicText
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-
-    if (
-      !additions
-    ) {
-      return original;
-    }
-
-
-    /*
-     * Final guard: never knowingly exceed reported maxChars.
-     */
-
-    if (
-      original.length +
-        additions.length +
-        1 >
-      maxChars
-    ) {
-      /*
-       * Drop Story Card backup first.
-       */
-      const withoutCards =
-        [
-          ruleBlock,
-          dynamicText
-        ]
-          .filter(Boolean)
-          .join("\n");
-
-      if (
-        withoutCards &&
-        original.length +
-          withoutCards.length +
-          1 <=
-        maxChars
-      ) {
-        return (
-          original +
-          "\n" +
-          withoutCards
-        );
-      }
-
-      /*
-       * Dynamic instructions alone are preferable to mutilating
-       * AI Dungeon's optimized prefix.
-       */
-      if (
-        dynamicText &&
-        original.length +
-          dynamicText.length +
-          1 <=
-        maxChars
-      ) {
-        return (
-          original +
-          "\n" +
-          dynamicText
-        );
-      }
-
-      return original;
-    }
-
-
-    return (
-      original +
-      "\n" +
-      additions
-    );
-  };
-
-
-  /*
-   * ============================================================
    * CONTEXT
    * ============================================================
    */
@@ -2438,9 +2004,6 @@ ${pieces.join("\n")}
   ) => {
     const action =
       prepareState();
-
-    const optimized =
-      optimizedContextEnabled();
 
     const historyList =
       Array.isArray(
@@ -2500,9 +2063,7 @@ ${pieces.join("\n")}
 
 
     /*
-     * ----------------------------------------------------------
-     * DIALOGUE CONTINUITY
-     * ----------------------------------------------------------
+     * Dialogue continuation.
      */
 
     const dialoguePending =
@@ -2516,30 +2077,27 @@ ${pieces.join("\n")}
         )
       );
 
-    /*
-     * Consume it. Output can set it again after this generation.
-     */
     state.arcDialogueContinuityPending =
       false;
 
 
-    /*
-     * ----------------------------------------------------------
-     * STORY CARDS
-     * ----------------------------------------------------------
-     */
+    const cleanedText =
+      stripArcBlocks(
+        text
+      );
 
     const cards =
       trackRelevantCards(
         active
       );
 
+    const cardsBlock =
+      buildRelevantCardsBlock(
+        cards,
+        cleanedText,
+        active
+      );
 
-    /*
-     * ----------------------------------------------------------
-     * LOOP BREAKING
-     * ----------------------------------------------------------
-     */
 
     const loopRisk =
       (
@@ -2558,35 +2116,7 @@ ${pieces.join("\n")}
     }
 
 
-    /*
-     * ----------------------------------------------------------
-     * TURN DIRECTIVE
-     * ----------------------------------------------------------
-     */
-
-    const turnDirective =
-      (
-        state.arcTurnDirective &&
-        state.arcTurnDirectiveAction ===
-          action
-      )
-        ? `
-[ARC TURN DIRECTIVE]
-
-${state.arcTurnDirective}
-
-[/ARC TURN DIRECTIVE]
-`
-        : "";
-
-
-    /*
-     * ----------------------------------------------------------
-     * BASE RULES
-     * ----------------------------------------------------------
-     */
-
-    let fullRules =
+    let directives =
       CORE_RULES +
       "\n" +
       ANTI_REPEAT;
@@ -2594,57 +2124,10 @@ ${state.arcTurnDirective}
     if (
       active
     ) {
-      fullRules +=
+      directives +=
         "\n" +
         COMBAT_RULES;
     }
-
-
-    /*
-     * ==========================================================
-     * OPTIMIZED CONTEXT MODE
-     * ==========================================================
-     */
-
-    if (
-      optimized
-    ) {
-      return {
-        text:
-          buildOptimizedContext(
-            text,
-            fullRules,
-            active,
-            cards,
-            dialoguePending,
-            loopRisk,
-            turnDirective
-          )
-      };
-    }
-
-
-    /*
-     * ==========================================================
-     * STANDARD CONTEXT MODE
-     * ==========================================================
-     */
-
-    const cleanedText =
-      stripArcBlocks(
-        text
-      );
-
-    const cardsBlock =
-      buildRelevantCardsBlock(
-        cards,
-        cleanedText,
-        active,
-        CONFIG.MAX_CARD_CONTEXT_CHARS
-      );
-
-    let directives =
-      fullRules;
 
     if (
       dialoguePending
@@ -2670,13 +2153,103 @@ ${state.arcTurnDirective}
         LOOP_BREAKER;
     }
 
+
+    const latestIsPlayer =
+      newest &&
+      PLAYER_TYPES.has(
+        newest.type
+      );
+
+    const turnDirective =
+      latestIsPlayer &&
+      state.arcTurnDirective
+        ? `
+[ARC TURN DIRECTIVE]
+
+${state.arcTurnDirective}
+
+[/ARC TURN DIRECTIVE]
+`
+        : "";
+
+
+    /*
+     * Preserve Memory / Plot Essentials.
+     */
+
+    const memoryLength =
+      Math.min(
+        info.memoryLength ||
+          0,
+        cleanedText.length
+      );
+
+    const memoryPart =
+      memoryLength
+        ? cleanedText.slice(
+            0,
+            memoryLength
+          )
+        : "";
+
+    let storyPart =
+      memoryLength
+        ? cleanedText.slice(
+            memoryLength
+          )
+        : cleanedText;
+
+
+    /*
+     * IMPORTANT:
+     * This is the history de-duplication that the Optimized
+     * Context version stopped doing.
+     */
+    storyPart =
+      dedupeContextHistory(
+        storyPart
+      );
+
+
+    const maxChars =
+      info.maxChars ||
+      (
+        memoryPart.length +
+        directives.length +
+        storyPart.length +
+        turnDirective.length +
+        1000
+      );
+
+    const availableStoryChars =
+      Math.max(
+        0,
+        maxChars -
+          memoryPart.length -
+          directives.length -
+          turnDirective.length -
+          4
+      );
+
+    storyPart =
+      availableStoryChars >
+        0
+        ? storyPart.slice(
+            -availableStoryChars
+          )
+        : "";
+
+
     return {
       text:
-        buildNormalContext(
-          text,
+        [
+          memoryPart,
           directives,
+          storyPart,
           turnDirective
-        )
+        ]
+          .filter(Boolean)
+          .join("\n")
     };
   };
 
@@ -2693,26 +2266,15 @@ ${state.arcTurnDirective}
     const action =
       prepareState();
 
-    /*
-     * Output hook also gets direct awareness when AI Dungeon
-     * supplies info.useCacheEfficient.
-     */
-    const optimized =
-      optimizedContextEnabled();
-
-    state.arcOptimizedContext =
-      optimized;
-
     const original =
       String(
-        text || ""
+        text ||
+          ""
       );
 
 
     /*
-     * ----------------------------------------------------------
-     * COMBAT STATE
-     * ----------------------------------------------------------
+     * Combat state.
      */
 
     if (
@@ -2733,11 +2295,6 @@ ${state.arcTurnDirective}
         original
       )
     ) {
-      /*
-       * AI can START combat.
-       * AI prose does not continually refresh an already active
-       * battle timer.
-       */
       state.arcCombatUntil =
         action +
         CONFIG.COMBAT_GRACE_ACTIONS;
@@ -2746,7 +2303,8 @@ ${state.arcTurnDirective}
 
     /*
      * ==========================================================
-     * PHASE 1 — SAME RESPONSE DUPLICATION
+     * PHASE 1:
+     * DUPLICATION INSIDE CURRENT RESPONSE
      * ==========================================================
      */
 
@@ -2793,7 +2351,8 @@ ${state.arcTurnDirective}
 
     /*
      * ==========================================================
-     * PHASE 2 — RECENT AI HISTORY
+     * PHASE 2:
+     * COMPARE WITH RECENT AI OUTPUTS
      * ==========================================================
      */
 
@@ -2814,14 +2373,12 @@ ${state.arcTurnDirective}
             )
         : [];
 
-    /*
-     * Avoid comparing current output against itself.
-     */
     if (
       recentAI.length &&
       normalize(
         recentAI[
-          recentAI.length - 1
+          recentAI.length -
+            1
         ].text
       ) ===
         normalize(
@@ -2839,7 +2396,8 @@ ${state.arcTurnDirective}
       [];
 
     for (
-      const item of recentAI
+      const item of
+      recentAI
     ) {
       historicalParagraphs.push(
         ...splitParagraphs(
@@ -2858,7 +2416,8 @@ ${state.arcTurnDirective}
       const substantial =
         normalize(
           paragraph
-        ).length >= 100;
+        ).length >=
+        100;
 
       const duplicateHistory =
         substantial &&
@@ -2889,7 +2448,8 @@ ${state.arcTurnDirective}
 
     /*
      * ==========================================================
-     * PHASE 3 — SECOND INTERNAL PASS
+     * PHASE 3:
+     * SECOND INTERNAL PASS
      * ==========================================================
      */
 
@@ -2937,10 +2497,6 @@ ${state.arcTurnDirective}
         .join("\n\n")
         .trim();
 
-
-    /*
-     * Never intentionally return an empty generation.
-     */
     if (
       !cleaned &&
       internallyCleaned.length
@@ -2963,38 +2519,23 @@ ${state.arcTurnDirective}
     }
 
 
-    /*
-     * ==========================================================
-     * LOOP BREAK SIGNAL
-     * ==========================================================
-     */
-
     if (
       repetitionDetected
     ) {
       state.arcForceLoopBreak =
         true;
 
-      /*
-       * Optimized Context cannot perform the same history rewrite
-       * as normal mode, so keep the preventative loop instruction
-       * active slightly longer when a loop was actually detected.
-       */
       state.arcLoopBreakTurns =
         Math.max(
           state.arcLoopBreakTurns ||
             0,
-          optimized
-            ? CONFIG.LOOP_BREAK_TURNS + 1
-            : CONFIG.LOOP_BREAK_TURNS
+          CONFIG.LOOP_BREAK_TURNS
         );
     }
 
 
     /*
-     * ==========================================================
-     * DIALOGUE CONTINUITY SIGNAL
-     * ==========================================================
+     * Remember unfinished dialogue for next generation.
      */
 
     state.arcDialogueContinuityPending =
@@ -3011,7 +2552,7 @@ ${state.arcTurnDirective}
 
   /*
    * ============================================================
-   * EXPOSE ARC API
+   * EXPOSE API
    * ============================================================
    */
 
@@ -3024,8 +2565,7 @@ ${state.arcTurnDirective}
     similarity,
     isDuplicate,
     looksLikeDialogueSetup,
-    looksLikePlayerDialogue,
-    optimizedContextEnabled
+    looksLikePlayerDialogue
   };
 
 })();
