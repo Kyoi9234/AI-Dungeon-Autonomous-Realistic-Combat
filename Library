@@ -152,7 +152,7 @@ Current condition includes:
 
 - Current condition modifies baseline capability.
 - A normally fast fighter with badly injured legs should not operate at full healthy speed.
-- A normally powerful fighter who is exhausted and nearly out of energy performs according to that weakened current condition.
+- A normally powerful fighter who is exhausted and nearly out of energy performs according to their weakened current condition.
 
 
 SOURCE PRIORITY
@@ -298,6 +298,50 @@ Examples:
 - Difficult mental tasks.
 
 [/ARC CORE RULES]
+`;
+
+
+  /*
+   * ============================================================
+   * SCENE CONTINUITY — ALWAYS ACTIVE
+   * ============================================================
+   */
+
+  const SCENE_CONTINUITY = `
+[ARC SCENE CONTINUITY]
+
+CONTINUE FROM THE CURRENT SCENE.
+
+- Treat the final established moment of recent history as the exact current reality.
+- Continue immediately from where the story actually stopped.
+- Do not suddenly jump to an unrelated scene.
+- Do not suddenly change location.
+- Do not suddenly change the time of day.
+- Do not suddenly replace the current characters with unrelated characters.
+- Do not act as though unresolved events have already ended.
+- Do not skip over unresolved combat, danger, dialogue, pursuit, confrontation, injury, or other active situations.
+- Pressing Continue means continue the CURRENT situation unless a transition has already been established.
+
+Maintain continuity of:
+- Location.
+- Time.
+- Characters present.
+- Current opponents.
+- Injuries.
+- Fatigue.
+- Positioning.
+- Active abilities.
+- Equipment state.
+- Ongoing dialogue.
+- Immediate threats.
+- Current goals.
+- Unresolved actions.
+
+- Scene transitions must follow established cause and effect.
+- If a scene is unresolved, stay in that scene.
+- Do not solve repetition by abandoning the current scene.
+
+[/ARC SCENE CONTINUITY]
 `;
 
 
@@ -658,19 +702,19 @@ Dialogue may occur during:
 - A character may continue speaking while moving, defending, preparing an attack, attacking, or repositioning.
 - If a character begins an explanation, threat, boast, joke, argument, question, or conversational setup, preserve the logical continuation of that thought.
 - Do not abruptly replace a clearly leading statement with an unrelated attack.
-- If the previous response ends with a setup such as "here's the thing," "the reason is," "the truth is," "let me tell you," "you know why," "what you don't understand," or similar wording, normally continue or complete the thought.
+- If the previous response ends with a conversational setup, normally continue or complete the thought unless something genuinely interrupts it.
 - A conversational thought may be interrupted when an actual immediate event justifies interruption.
-- When the player taunts, questions, threatens, insults, jokes with, or directly addresses a combatant, allow that character to respond according to personality when appropriate.
+- When the player directly addresses a combatant, allow that character to respond according to personality when appropriate.
 
 Narrative priority when events compete:
 1. Immediate lethal danger requiring an urgent reaction.
 2. Necessary defense or interruption.
 3. A pending conversational thought.
-4. A natural response to dialogue directed at the character.
+4. A natural response to dialogue.
 5. Tactical movement, preparation, or observation.
 6. A new offensive action.
 
-- This priority is NOT a rigid turn order.
+- This priority is not rigid turn order.
 
 
 MORTALITY
@@ -709,7 +753,7 @@ Do not guarantee:
 - Do not merely paraphrase the player's latest action.
 - Do not merely paraphrase the previous AI response.
 
-Every response should move the SCENE forward.
+Every response should move the CURRENT SCENE forward.
 
 Forward progression may be:
 - Continuing dialogue.
@@ -731,6 +775,8 @@ Forward progression may be:
 - Change in momentum.
 
 - Do NOT interpret "move forward" as "someone must immediately attack."
+- Do NOT interpret "move forward" as "change to a different scene."
+- Solve repetition inside the existing situation.
 - Continuing an unfinished conversational thought is NOT repetition.
 - Answering another character is NOT repetition.
 - New dialogue that logically develops previous dialogue is NOT repetition.
@@ -770,19 +816,39 @@ unless repetition is intentionally meaningful in-story.
   const LOOP_BREAKER = `
 [ARC LOOP BREAKER]
 
-Recent model output showed a repetition pattern.
+Recent model output appears repetitive.
 
-- Break the pattern immediately.
-- Start from the newest unrepeated event.
-- Do not reuse the same opening.
-- Do not reuse the same attack sequence.
-- Do not reuse the same dialogue verbatim.
-- Do not reuse the same sentence structure.
-- Do not reuse the same description.
-- Do not reuse the same conclusion.
-- Do not quote or closely paraphrase a paragraph already present in recent history.
-- Continue logically unfinished dialogue rather than replaying it.
-- Advance to a materially different next development that follows established cause and effect.
+Break the repetition WITHOUT abandoning the current scene.
+
+- Continue from the exact newest established moment.
+- Produce a new LOCAL consequence, reaction, tactic, line of dialogue, movement, injury, discovery, or change in momentum.
+- Do NOT change location merely to avoid repetition.
+- Do NOT change time of day merely to avoid repetition.
+- Do NOT replace the current cast with unrelated characters.
+- Do NOT suddenly start an unrelated activity.
+- Do NOT skip ahead to a different scene merely because recent prose was repetitive.
+- Do NOT restart the current scene from an earlier point.
+- Do NOT reuse the same opening.
+- Do NOT reuse the same attack sequence.
+- Do NOT reuse the same dialogue verbatim.
+- Do NOT reuse the same sentence structure.
+- Do NOT reuse the same description.
+- Do NOT reuse the same conclusion.
+- Do not quote or closely paraphrase paragraphs already narrated.
+- Preserve unfinished dialogue.
+- Preserve unresolved combat.
+- Preserve current injuries.
+- Preserve current positions.
+- Preserve current threats.
+- Preserve current immediate circumstances.
+
+A scene transition is allowed only when:
+- The player explicitly causes or requests it.
+- Recent story explicitly establishes the transition.
+- The current scene has actually concluded.
+- A natural cause-and-effect event moves the characters elsewhere.
+
+Solve repetition by advancing the CURRENT scene, not by replacing it.
 
 [/ARC LOOP BREAKER]
 `;
@@ -811,6 +877,50 @@ The previous scene contains a conversational setup, leading statement, or though
 - If immediate danger genuinely interrupts the speaker, make the interruption clear.
 
 [/ARC DIALOGUE CONTINUITY]
+`;
+
+
+  /*
+   * ============================================================
+   * CONTINUE ANCHOR
+   * ============================================================
+   */
+
+  const CONTINUE_ANCHOR = `
+[ARC CONTINUE ANCHOR]
+
+The player requested continuation.
+
+Continue DIRECTLY from the final established moment in recent story history.
+
+Do not:
+- Start a new unrelated scene.
+- Jump forward in time.
+- Change locations without an established transition.
+- Replace the current cast.
+- Treat unresolved combat as finished.
+- Treat unresolved dialogue as finished.
+- Treat unresolved danger as finished.
+- Invent an off-screen resolution.
+- Restart from an earlier point in the scene.
+
+Preserve:
+- Current location.
+- Current time.
+- Characters currently present.
+- Ongoing combat.
+- Current opponents.
+- Injuries.
+- Fatigue.
+- Positioning.
+- Active abilities.
+- Equipment state.
+- Ongoing dialogue.
+- Immediate threats.
+
+The next narration should be the immediate continuation of what just happened.
+
+[/ARC CONTINUE ANCHOR]
 `;
 
 
@@ -1130,6 +1240,10 @@ The previous scene contains a conversational setup, leading statement, or though
         "\n"
       )
       .replace(
+        /\n?\[ARC SCENE CONTINUITY\][\s\S]*?\[\/ARC SCENE CONTINUITY\]\n?/g,
+        "\n"
+      )
+      .replace(
         /\n?\[ARC COMBAT RULES\][\s\S]*?\[\/ARC COMBAT RULES\]\n?/g,
         "\n"
       )
@@ -1151,6 +1265,10 @@ The previous scene contains a conversational setup, leading statement, or though
       )
       .replace(
         /\n?\[ARC DIALOGUE CONTINUITY\][\s\S]*?\[\/ARC DIALOGUE CONTINUITY\]\n?/g,
+        "\n"
+      )
+      .replace(
+        /\n?\[ARC CONTINUE ANCHOR\][\s\S]*?\[\/ARC CONTINUE ANCHOR\]\n?/g,
         "\n"
       );
 
@@ -1292,9 +1410,9 @@ The previous scene contains a conversational setup, leading statement, or though
         Math.floor(
           entry.length / 2
         ) -
-          Math.floor(
-            fingerprintSize / 2
-          )
+        Math.floor(
+          fingerprintSize / 2
+        )
       );
 
     const middle =
@@ -1419,6 +1537,77 @@ The previous scene contains a conversational setup, leading statement, or though
 
   /*
    * ============================================================
+   * RECENT UNRESOLVED COMBAT
+   * ============================================================
+   *
+   * Prevent combat rules from disappearing merely because the
+   * player pressed Continue several times.
+   */
+
+  const recentUnresolvedCombat = (
+    historyList
+  ) => {
+    let active =
+      false;
+
+    /*
+     * Only inspect recent history so very old fights don't keep
+     * combat mode alive forever.
+     */
+    const recent =
+      historyList.slice(-6);
+
+    for (
+      const item of recent
+    ) {
+      const value =
+        String(
+          (
+            item &&
+            item.text
+          ) ||
+            ""
+        );
+
+      if (
+        !value
+      ) {
+        continue;
+      }
+
+      /*
+       * Explicit combat ending clears the flag.
+       */
+      if (
+        END_SIGNAL.test(
+          value
+        )
+      ) {
+        active =
+          false;
+
+        continue;
+      }
+
+      /*
+       * Newer combat evidence turns it back on.
+       */
+      if (
+        COMBAT_SIGNAL.test(
+          value
+        )
+      ) {
+        active =
+          true;
+      }
+    }
+
+    return active;
+  };
+
+
+  /*
+   * ============================================================
    * STATE
    * ============================================================
    */
@@ -1492,7 +1681,7 @@ The previous scene contains a conversational setup, leading statement, or though
   ) => {
     const parts =
       [
-        "Resolve the newest player input exactly once. Treat declared outcomes, quantities, finishing claims, and speed blitz claims as attempts. Do not simply echo or paraphrase the player's wording; begin with a new reaction, consequence, continuation, or development."
+        "Resolve the newest player input exactly once. Treat declared outcomes, quantities, finishing claims, and speed blitz claims as attempts. Do not simply echo or paraphrase the player's wording; begin with a new reaction, consequence, continuation, or development. Remain in the current established scene unless the player's action itself causes a transition."
       ];
 
     if (
@@ -1509,7 +1698,7 @@ The previous scene contains a conversational setup, leading statement, or though
       wasRepeated
     ) {
       parts.push(
-        "The player intentionally repeated a similar action. Resolve it as a NEW attempt from the CURRENT position, injuries, fatigue, energy, defenses, and reactions. Do not reuse the previous narration or outcome wording."
+        "The player intentionally repeated a similar action. Resolve it as a NEW attempt from the CURRENT position, injuries, fatigue, energy, defenses, and reactions. Do not reuse the previous narration or outcome wording, and do not leave the current scene merely to create novelty."
       );
     }
 
@@ -1517,7 +1706,7 @@ The previous scene contains a conversational setup, leading statement, or though
       activeCombat
     ) {
       parts.push(
-        "Combat remains active and autonomous. Other capable combatants may react, interrupt, defend, counter, reposition, speak, or continue their own fights while this attempt is resolved. Do not assume forward progress requires an immediate attack."
+        "Combat remains active and autonomous. Other capable combatants may react, interrupt, defend, counter, reposition, speak, or continue their own fights while this attempt is resolved. Do not assume forward progress requires an immediate attack or a scene transition."
       );
     }
 
@@ -1581,7 +1770,7 @@ The previous scene contains a conversational setup, leading statement, or though
               item &&
               item.text
             ) ||
-            ""
+              ""
         )
         .join("\n");
 
@@ -1880,6 +2069,10 @@ ${pieces.join("\n")}
       return false;
     }
 
+    /*
+     * Strong paragraph-level duplication still immediately
+     * activates the loop breaker.
+     */
     if (
       hasDuplicateParagraph(
         recentAI[0].text,
@@ -1890,11 +2083,18 @@ ${pieces.join("\n")}
       return true;
     }
 
+    /*
+     * Whole-response similarity used to be 0.60.
+     *
+     * That was too aggressive for combat because normal adjacent
+     * fight responses naturally reuse names, locations, attacks,
+     * and tactical vocabulary.
+     */
     return (
       similarity(
         recentAI[0].text,
         recentAI[1].text
-      ) >= 0.60
+      ) >= 0.78
     );
   };
 
@@ -2031,6 +2231,11 @@ ${pieces.join("\n")}
             item.text
         );
 
+
+    /*
+     * Explicit combat ending.
+     */
+
     if (
       newest &&
       END_SIGNAL.test(
@@ -2045,10 +2250,39 @@ ${pieces.join("\n")}
         {};
     }
 
+
+    /*
+     * Combat stays active if either:
+     *
+     * 1. ARC's normal timer says it is active, OR
+     * 2. recent story still clearly contains unresolved combat.
+     */
+
     const active =
       combatActive(
         action
+      ) ||
+      recentUnresolvedCombat(
+        historyList
       );
+
+
+    /*
+     * Refresh the internal timer from recent unresolved combat
+     * without making AI combat prose refresh it forever.
+     *
+     * This simply keeps rules alive for the current generation.
+     */
+    if (
+      active &&
+      !combatActive(
+        action
+      )
+    ) {
+      state.arcCombatUntil =
+        action + 2;
+    }
+
 
     if (
       !active &&
@@ -2063,7 +2297,9 @@ ${pieces.join("\n")}
 
 
     /*
-     * Dialogue continuation.
+     * ==========================================================
+     * DIALOGUE CONTINUITY
+     * ==========================================================
      */
 
     const dialoguePending =
@@ -2081,10 +2317,23 @@ ${pieces.join("\n")}
       false;
 
 
+    /*
+     * ==========================================================
+     * CLEAN CONTEXT
+     * ==========================================================
+     */
+
     const cleanedText =
       stripArcBlocks(
         text
       );
+
+
+    /*
+     * ==========================================================
+     * STORY CARDS
+     * ==========================================================
+     */
 
     const cards =
       trackRelevantCards(
@@ -2098,6 +2347,12 @@ ${pieces.join("\n")}
         active
       );
 
+
+    /*
+     * ==========================================================
+     * LOOP BREAKER
+     * ==========================================================
+     */
 
     const loopRisk =
       (
@@ -2116,8 +2371,16 @@ ${pieces.join("\n")}
     }
 
 
+    /*
+     * ==========================================================
+     * BUILD DIRECTIVES
+     * ==========================================================
+     */
+
     let directives =
       CORE_RULES +
+      "\n" +
+      SCENE_CONTINUITY +
       "\n" +
       ANTI_REPEAT;
 
@@ -2154,6 +2417,12 @@ ${pieces.join("\n")}
     }
 
 
+    /*
+     * ==========================================================
+     * PLAYER TURN DIRECTIVE
+     * ==========================================================
+     */
+
     const latestIsPlayer =
       newest &&
       PLAYER_TYPES.has(
@@ -2174,7 +2443,31 @@ ${state.arcTurnDirective}
 
 
     /*
-     * Preserve Memory / Plot Essentials.
+     * ==========================================================
+     * CONTINUE ANCHOR
+     * ==========================================================
+     *
+     * When the newest history entry is an AI Continue result,
+     * Context is usually being asked to continue from that exact
+     * point without a new player action.
+     */
+
+    const continuingFromAI =
+      newest &&
+      newest.type ===
+        "continue";
+
+
+    const continueAnchor =
+      continuingFromAI
+        ? CONTINUE_ANCHOR
+        : "";
+
+
+    /*
+     * ==========================================================
+     * PRESERVE MEMORY / PLOT ESSENTIALS
+     * ==========================================================
      */
 
     const memoryLength =
@@ -2201,15 +2494,26 @@ ${state.arcTurnDirective}
 
 
     /*
-     * IMPORTANT:
-     * This is the history de-duplication that the Optimized
-     * Context version stopped doing.
+     * ==========================================================
+     * HISTORY DE-DUPLICATION
+     * ==========================================================
+     *
+     * Removes duplicate prose only from what the model sees.
+     *
+     * It does NOT edit the visible adventure.
      */
+
     storyPart =
       dedupeContextHistory(
         storyPart
       );
 
+
+    /*
+     * ==========================================================
+     * CONTEXT SIZE
+     * ==========================================================
+     */
 
     const maxChars =
       info.maxChars ||
@@ -2217,9 +2521,11 @@ ${state.arcTurnDirective}
         memoryPart.length +
         directives.length +
         storyPart.length +
+        continueAnchor.length +
         turnDirective.length +
         1000
       );
+
 
     const availableStoryChars =
       Math.max(
@@ -2227,9 +2533,15 @@ ${state.arcTurnDirective}
         maxChars -
           memoryPart.length -
           directives.length -
+          continueAnchor.length -
           turnDirective.length -
-          4
+          5
       );
+
+
+    /*
+     * Preserve newest history when trimming.
+     */
 
     storyPart =
       availableStoryChars >
@@ -2240,12 +2552,29 @@ ${state.arcTurnDirective}
         : "";
 
 
+    /*
+     * ==========================================================
+     * FINAL CONTEXT ORDER
+     * ==========================================================
+     *
+     * Memory / Plot Essentials
+     * ↓
+     * ARC rules
+     * ↓
+     * Recent story
+     * ↓
+     * Continue anchor
+     * ↓
+     * Player turn directive
+     */
+
     return {
       text:
         [
           memoryPart,
           directives,
           storyPart,
+          continueAnchor,
           turnDirective
         ]
           .filter(Boolean)
@@ -2274,7 +2603,9 @@ ${state.arcTurnDirective}
 
 
     /*
-     * Combat state.
+     * ==========================================================
+     * COMBAT STATE
+     * ==========================================================
      */
 
     if (
@@ -2319,6 +2650,7 @@ ${state.arcTurnDirective}
     let repetitionDetected =
       false;
 
+
     for (
       const paragraph of
       generatedParagraphs
@@ -2352,7 +2684,7 @@ ${state.arcTurnDirective}
     /*
      * ==========================================================
      * PHASE 2:
-     * COMPARE WITH RECENT AI OUTPUTS
+     * COMPARE AGAINST RECENT AI OUTPUTS
      * ==========================================================
      */
 
@@ -2373,6 +2705,11 @@ ${state.arcTurnDirective}
             )
         : [];
 
+
+    /*
+     * Avoid comparing the output against itself.
+     */
+
     if (
       recentAI.length &&
       normalize(
@@ -2392,8 +2729,10 @@ ${state.arcTurnDirective}
         );
     }
 
+
     const historicalParagraphs =
       [];
+
 
     for (
       const item of
@@ -2406,8 +2745,10 @@ ${state.arcTurnDirective}
       );
     }
 
+
     const novelParagraphs =
       [];
+
 
     for (
       const paragraph of
@@ -2456,6 +2797,7 @@ ${state.arcTurnDirective}
     const secondPass =
       [];
 
+
     for (
       const paragraph of
       novelParagraphs
@@ -2488,7 +2830,7 @@ ${state.arcTurnDirective}
 
     /*
      * ==========================================================
-     * BUILD OUTPUT
+     * BUILD CLEAN OUTPUT
      * ==========================================================
      */
 
@@ -2496,6 +2838,11 @@ ${state.arcTurnDirective}
       secondPass
         .join("\n\n")
         .trim();
+
+
+    /*
+     * Never intentionally return an empty result.
+     */
 
     if (
       !cleaned &&
@@ -2511,6 +2858,7 @@ ${state.arcTurnDirective}
         true;
     }
 
+
     if (
       !cleaned
     ) {
@@ -2518,6 +2866,12 @@ ${state.arcTurnDirective}
         original.trim();
     }
 
+
+    /*
+     * ==========================================================
+     * LOOP BREAK SIGNAL
+     * ==========================================================
+     */
 
     if (
       repetitionDetected
@@ -2535,7 +2889,9 @@ ${state.arcTurnDirective}
 
 
     /*
-     * Remember unfinished dialogue for next generation.
+     * ==========================================================
+     * DIALOGUE CONTINUITY SIGNAL
+     * ==========================================================
      */
 
     state.arcDialogueContinuityPending =
